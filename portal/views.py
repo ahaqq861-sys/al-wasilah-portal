@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import SchoolBranding, GradeReport, FeeLedger, StudentProfile, TeacherProfile
+from .models import SchoolBranding, GradeReport, FeeLedger, StudentProfile, TeacherProfile, LedgerEntry
 
 def login_view(request):
     branding = SchoolBranding.objects.first()
