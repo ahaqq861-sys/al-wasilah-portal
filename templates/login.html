@@ -2,148 +2,37 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | AL-WASILAH SCHOOL COMPLEX</title>
+    <title>Login - {{ branding.school_name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --school-wine: #6b1d2f;
-            --school-wine-dark: #4a1320;
-            --school-gold: #d4af37;
-        }
-        body {
-            background: linear-gradient(135deg, var(--school-wine) 0%, var(--school-wine-dark) 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px 10px;
-        }
-        .login-card {
-            width: 100%;
-            max-width: 460px;
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
-            background: #ffffff;
-        }
-        .login-header {
-            background-color: var(--school-wine);
-            color: #ffffff;
-            padding: 25px 20px 20px 20px;
-            text-align: center;
-            border-bottom: 4px solid var(--school-gold);
-        }
-        .crest-badge {
-            width: 90px;
-            height: 90px;
-            background-color: white;
-            border-radius: 50%;
-            padding: 5px;
-            margin: 0 auto 12px auto;
-            border: 3px solid var(--school-gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        .crest-badge i {
-            color: var(--school-wine);
-            font-size: 2.8rem;
-        }
-        .motto-banner {
-            background-color: var(--school-gold);
-            color: #000;
-            font-weight: 800;
-            font-size: 0.70rem;
-            letter-spacing: 0.8px;
-            padding: 5px 12px;
-            border-radius: 12px;
-            display: inline-block;
-            margin-top: 8px;
-            text-transform: uppercase;
-        }
-        .login-body {
-            padding: 30px 25px 20px 25px;
-        }
-        .btn-wine {
-            background-color: var(--school-wine);
-            color: white;
-            font-weight: 700;
-            padding: 12px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            border: none;
-        }
-        .btn-wine:hover {
-            background-color: var(--school-wine-dark);
-            color: var(--school-gold);
-        }
-        .contact-info {
-            font-size: 0.78rem;
-            color: #6c757d;
-            background-color: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-            padding: 15px;
-            text-align: center;
-        }
+        body { background-color: #2c3e50; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-card { width: 100%; max-width: 400px; padding: 30px; background: #fff; border-radius: 8px; shadow: 0 4px 6px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <div class="login-header">
-        <div class="crest-badge">
-            <i class="fa-solid fa-graduation-cap"></i>
+    <h4 class="text-center text-success fw-bold mb-1">{{ branding.school_name }}</h4>
+    <p class="text-center text-muted small mb-4">{{ branding.motto }}</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger p-2 small">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label fw-bold">Username</label>
+            <input type="text" name="username" class="form-control" required>
         </div>
-        <h4 class="fw-bold mb-0 text-white" style="letter-spacing: 0.5px;">AL-WASILAH</h4>
-        <div class="fw-semibold text-white-50 small mb-1">SCHOOL COMPLEX</div>
-        <div class="motto-banner">KNOWLEDGE, INTEGRITY AND EXCELLENCE</div>
-    </div>
-    
-    <div class="login-body">
-        <h6 class="text-center text-muted mb-4 fw-semibold">Basic School Student & Staff Portal</h6>
-        
-        {% if error %}
-            <div class="alert alert-danger d-flex align-items-center py-2 fs-6" role="alert">
-                <i class="fa-solid fa-circle-exclamation me-2"></i>
-                <div>{{ error }}</div>
-            </div>
-        {% endif %}
-
-        <form method="POST" action="{% url 'login' %}">
-            {% csrf_token %}
-            
-            <div class="mb-3">
-                <label for="username" class="form-label fw-bold small text-secondary">Username / Student Index No.</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light"><i class="fa-solid fa-user text-muted"></i></span>
-                    <input type="text" name="username" class="form-control" placeholder="e.g. admin or AWS/2026/001" required>
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <label for="password" class="form-label fw-bold small text-secondary">Password</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light"><i class="fa-solid fa-lock text-muted"></i></span>
-                    <input type="password" name="password" class="form-control" placeholder="Enter password" required>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-wine w-100 mb-2">
-                <i class="fa-solid fa-right-to-bracket me-2"></i> Sign In
-            </button>
-        </form>
-    </div>
-    
-    <div class="contact-info">
-        <div class="fw-bold mb-1" style="color: var(--school-wine);"><i class="fa-solid fa-location-dot me-1"></i> P.O.Box 161 TL, Tamale</div>
-        <div><i class="fa-solid fa-phone me-1"></i> 0244963410 / 0246849302 / 0243881080</div>
-        <div><i class="fa-solid fa-envelope me-1"></i> alwasilaschool2026@gmail.com</div>
-    </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Password</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-success w-100 fw-bold">Log In</button>
+    </form>
 </div>
 
 </body>

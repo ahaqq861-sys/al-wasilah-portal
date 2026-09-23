@@ -1,10 +1,35 @@
 import calendar
 from datetime import datetime
 from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
 from .models import SchoolBranding, GradeReport, FeeLedger, StudentProfile, TeacherProfile
+
+def login_view(request):
+    branding = SchoolBranding.objects.first()
+    if not branding:
+        branding = SchoolBranding.objects.create()
+
+    if request.user.is_authenticated:
+        return redirect('portal:dashboard')
+
+    if request.method == 'POST':
+        u_name = request.POST.get('username')
+        p_word = request.POST.get('password')
+        user = authenticate(request, username=u_name, password=p_word)
+        if user is not None:
+            login(request, user)
+            return redirect('portal:dashboard')
+        else:
+            messages.error(request, "Invalid username or password.")
+
+    return render(request, 'portal/login.html', {'branding': branding})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
 
 @login_required
 def dashboard_view(request):
