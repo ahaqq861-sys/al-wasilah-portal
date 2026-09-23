@@ -6,5 +6,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
-    path('portal/', include('portal.urls')),  # Links to portal app URLs
+    path('portal/', include('portal.urls')),
 ]
