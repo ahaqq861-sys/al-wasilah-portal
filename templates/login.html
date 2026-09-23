@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | {{ branding.school_name|default:"Al-Wasilah School Complex" }}</title>
+</head>
+<body>
+    <h2>{{ branding.school_name|default:"Al-Wasilah School Complex" }}</h2>
+    <p><em>{{ branding.motto|default:"Knowledge, Virtue & Excellence" }}</em></p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            <label>Username:</label>
+            <input type="text" name="username" required>
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" name="password" required>
+        </div>
+        <button type="submit">Sign In</button>
+    </form>
+</body>
+</html>
