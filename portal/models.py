@@ -26,6 +26,21 @@ CLASS_LEVEL_CHOICES = (
     ('jhs_3', 'JHS 3'),
 )
 
+class SchoolBranding(models.Model):
+    school_name = models.CharField(max_length=255, default='AL WASILAH SCHOOL COMPLEX')
+    motto = models.CharField(max_length=255, default='KNOWLEDGE, INTEGRITY AND EXCELLENCE')
+    postal_address = models.CharField(max_length=255, default='P.O.Box 161 TL')
+    phone_numbers = models.CharField(max_length=255, default='0244963410 / 0246849302 / 0243881080')
+    email = models.EmailField(default='alwasilaschool2026@gmail.com')
+    primary_color = models.CharField(max_length=20, default='#6b1d2f')
+    secondary_color = models.CharField(max_length=20, default='#d4af37')
+    logo = models.ImageField(upload_to='branding/', null=True, blank=True)
+    current_academic_year = models.CharField(max_length=20, default='2025/2026')
+    current_term = models.CharField(max_length=20, default='Term 1')
+
+    def __str__(self):
+        return self.school_name
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
@@ -34,16 +49,6 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username} ({self.get_role_display()})"
-
-class SchoolBranding(models.Model):
-    school_name = models.CharField(max_length=255, default='Al-Wasilah School Complex')
-    motto = models.CharField(max_length=255, default='Knowledge, Virtue & Excellence')
-    logo_url = models.URLField(blank=True, default='')
-    current_academic_year = models.CharField(max_length=20, default='2025/2026')
-    current_term = models.CharField(max_length=20, default='Term 1')
-
-    def __str__(self):
-        return self.school_name
 
 class AcademicTerm(models.Model):
     name = models.CharField(max_length=50, default='Term 1')
@@ -60,21 +65,35 @@ class StudentProfile(models.Model):
     index_number = models.CharField(max_length=30, unique=True)
     uin = models.CharField(max_length=30, unique=True, blank=True, null=True)
     class_level = models.CharField(max_length=20, choices=CLASS_LEVEL_CHOICES)
+    age = models.IntegerField(default=5)
     gender = models.CharField(max_length=10, choices=(('MALE', 'Male'), ('FEMALE', 'Female')), default='MALE')
     nationality = models.CharField(max_length=50, default='GHANAIAN')
     fee_category = models.CharField(max_length=30, default='REGULAR')
     program_name = models.CharField(max_length=100, default='BASIC EDUCATION')
-    parent = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='children')
+    passport_photo = models.ImageField(upload_to='students/passports/', null=True, blank=True)
+    parent_name = models.CharField(max_length=100, blank=True, default='')
+    parent_contact = models.CharField(max_length=50, blank=True, default='')
+    parent_email = models.EmailField(blank=True, default='')
     date_of_birth = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.get_full_name() or self.user.username} [{self.index_number}]"
 
+class TeacherProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='teacher_data')
+    staff_id = models.CharField(max_length=30, unique=True)
+    class_assigned = models.CharField(max_length=20, choices=CLASS_LEVEL_CHOICES)
+    gender = models.CharField(max_length=10, choices=(('MALE', 'Male'), ('FEMALE', 'Female')), default='MALE')
+    age = models.IntegerField(default=25)
+    passport_photo = models.ImageField(upload_to='teachers/passports/', null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.get_full_name() or self.user.username} - {self.get_class_assigned_display()}"
+
 class GradeReport(models.Model):
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='grades')
     subject_code = models.CharField(max_length=20, default='SUB101')
     subject_name = models.CharField(max_length=100)
-    credit_hours = models.IntegerField(default=3)
     class_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     exam_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     total_mark = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
@@ -83,7 +102,7 @@ class GradeReport(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
-        self.total_mark = self.class_score + self.exam_score
+        self.total_mark = float(self.class_score) + float(self.exam_score)
         if self.total_mark >= 80:
             self.grade = 'A'
         elif self.total_mark >= 70:
@@ -95,9 +114,6 @@ class GradeReport(models.Model):
         else:
             self.grade = 'F'
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.student} - {self.subject_name}"
 
 class LedgerEntry(models.Model):
     ENTRY_TYPES = (
@@ -111,5 +127,12 @@ class LedgerEntry(models.Model):
     narration = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
+class SchoolDocument(models.Model):
+    title = models.CharField(max_length=255)
+    uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    class_level = models.CharField(max_length=20, choices=CLASS_LEVEL_CHOICES, null=True, blank=True)
+    file = models.FileField(upload_to='documents/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
-        return f"{self.student} - {self.entry_type} - GH¢{self.amount}"
+        return self.title
