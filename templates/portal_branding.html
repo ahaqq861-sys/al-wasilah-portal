@@ -1,0 +1,46 @@
+{% extends 'portal/base.html' %}
+
+{% block content %}
+<div class="top-navbar d-flex justify-content-between align-items-center mb-4 rounded">
+    <h4>Portal Branding</h4>
+    <span>Home / Portal Branding</span>
+</div>
+
+<div class="card border-0 shadow-sm p-4 col-md-8 mx-auto">
+    <h5 class="fw-bold mb-3">School Portal Branding & Settings</h5>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="form-label">School Name</label>
+                <input type="text" name="school_name" class="form-control" value="{{ branding.school_name }}">
+            </div>
+            <div class="col-12">
+                <label class="form-label">Motto</label>
+                <input type="text" name="motto" class="form-control" value="{{ branding.motto }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Postal Address</label>
+                <input type="text" name="postal_address" class="form-control" value="{{ branding.postal_address }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Phone Numbers</label>
+                <input type="text" name="phone_numbers" class="form-control" value="{{ branding.phone_numbers }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-control" value="{{ branding.email }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Current Academic Year</label>
+                <input type="text" name="current_academic_year" class="form-control" value="{{ branding.current_academic_year }}">
+            </div>
+            <div class="col-12">
+                <label class="form-label">Current Term / Trimester</label>
+                <input type="text" name="current_term" class="form-control" value="{{ branding.current_term }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success mt-3 w-100"><i class="fa fa-save me-1"></i> Save Changes</button>
+    </form>
+</div>
+{% endblock %}

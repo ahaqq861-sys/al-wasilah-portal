@@ -1,0 +1,44 @@
+{% extends 'portal/base.html' %}
+
+{% block content %}
+<div class="top-navbar d-flex justify-content-between align-items-center mb-4 rounded">
+    <h4>Student Ledger / Fees</h4>
+    <span>Home / Student Ledger</span>
+</div>
+
+<div class="card border-0 shadow-sm p-3">
+    <h5 class="mb-3 fw-bold">Financial Statement & Fee Ledgers</h5>
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+            <tr>
+                <th>Student</th>
+                <th>Description</th>
+                <th>Amount Due</th>
+                <th>Amount Paid</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ledger in ledgers %}
+            <tr>
+                <td>{{ ledger.student.get_full_name|default:ledger.student.username }}</td>
+                <td>{{ ledger.description }}</td>
+                <td>GHS {{ ledger.amount_due }}</td>
+                <td>GHS {{ ledger.amount_paid }}</td>
+                <td>
+                    {% if ledger.balance > 0 %}
+                        <span class="text-danger fw-bold">GHS {{ ledger.balance }}</span>
+                    {% else %}
+                        <span class="text-success fw-bold">GHS 0.00</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted">No fee records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
