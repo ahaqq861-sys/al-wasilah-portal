@@ -1,0 +1,41 @@
+{% extends 'portal/base.html' %}
+
+{% block title %}Portal Branding - {{ branding.school_name }}{% endblock %}
+
+{% block content %}
+<h3 class="fw-bold text-secondary mb-4">Portal Branding Settings</h3>
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width: 600px;">
+    <div class="card-header text-white fw-bold py-3" style="background-color: var(--brand-wine);">
+        School & System Customization
+    </div>
+    <div class="card-body p-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success p-2 small">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label fw-bold small">School Name</label>
+                <input type="text" name="school_name" class="form-control" value="{{ branding.school_name }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold small">Motto</label>
+                <input type="text" name="motto" class="form-control" value="{{ branding.motto }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold small">Current Academic Year</label>
+                <input type="text" name="current_academic_year" class="form-control" value="{{ branding.current_academic_year }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold small">Current Term</label>
+                <input type="text" name="current_term" class="form-control" value="{{ branding.current_term }}">
+            </div>
+            <button type="submit" class="btn text-white w-100 fw-bold py-2 mt-3" style="background-color: var(--brand-wine);">Update Settings</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

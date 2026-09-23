@@ -1,89 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Register Users - {{ branding.school_name }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .navbar-wine { background-color: {{ branding.primary_color|default:"#800020" }}; }
-        .btn-wine { background-color: {{ branding.primary_color|default:"#800020" }}; color: #ffffff; }
-        .btn-wine:hover { background-color: #600018; color: #ffffff; }
-    </style>
-</head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg navbar-dark navbar-wine mb-4">
-  <div class="container-fluid">
-    <a class="navbar-brand fw-bold" href="{% url 'portal:dashboard' %}">{{ branding.school_name }}</a>
-  </div>
-</nav>
+{% extends 'portal/base.html' %}
 
-<div class="container mb-5">
-    <div class="card shadow-sm mx-auto border-0" style="max-width: 650px;">
-        <div class="card-header text-white fw-bold" style="background-color: {{ branding.primary_color|default:'#800020' }};">
-            Register New Account
-        </div>
-        <div class="card-body p-4">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-info p-2 small">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
+{% block title %}Register Users - {{ branding.school_name }}{% endblock %}
 
-            <form method="POST">
-                {% csrf_token %}
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">Username</label>
-                        <input type="text" name="username" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">Password</label>
-                        <input type="password" name="password" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">First Name</label>
-                        <input type="text" name="first_name" class="form-control">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">Last Name</label>
-                        <input type="text" name="last_name" class="form-control">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">Role</label>
-                        <select name="role" class="form-select">
-                            <option value="student">Student</option>
-                            <option value="teacher">Teacher</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">Assigned Class</label>
-                        <input type="text" name="assigned_class" class="form-control" placeholder="e.g. Basic 1">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">Index Number (Student)</label>
-                        <input type="text" name="index_number" class="form-control">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">UIN (Student)</label>
-                        <input type="text" name="uin" class="form-control">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">Staff ID (Teacher)</label>
-                        <input type="text" name="staff_id" class="form-control">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold small">Parent Name</label>
-                        <input type="text" name="parent_name" class="form-control">
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label fw-bold small">Parent Contact</label>
-                        <input type="text" name="parent_contact" class="form-control">
-                    </div>
+{% block content %}
+<h3 class="fw-bold text-secondary mb-4">Register User Accounts</h3>
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width: 650px;">
+    <div class="card-header text-white fw-bold py-3" style="background-color: var(--brand-wine);">
+        Account Registration Form
+    </div>
+    <div class="card-body p-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info p-2 small">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Username</label>
+                    <input type="text" name="username" class="form-control" required>
                 </div>
-                <button type="submit" class="btn btn-wine w-100 fw-bold mt-4">Save Account</button>
-            </form>
-        </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Password</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">First Name</label>
+                    <input type="text" name="first_name" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Last Name</label>
+                    <input type="text" name="last_name" class="form-control">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Role</label>
+                    <select name="role" class="form-select">
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Assigned Class</label>
+                    <input type="text" name="assigned_class" class="form-control" placeholder="e.g. Basic 1">
+                </div>
+            </div>
+            <button type="submit" class="btn text-white w-100 fw-bold mt-4 py-2" style="background-color: var(--brand-wine);">Save User Account</button>
+        </form>
     </div>
 </div>
-</body>
-</html>
+{% endblock %}

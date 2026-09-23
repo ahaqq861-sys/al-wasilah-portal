@@ -1,0 +1,45 @@
+{% extends 'portal/base.html' %}
+
+{% block title %}Terminal Results - {{ branding.school_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-secondary mb-0">Terminal Examination Report</h3>
+    <button class="btn btn-sm btn-outline-danger" onclick="window.print()"><i class="fa-solid fa-print me-1"></i> Print Report</button>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark" style="background-color: var(--brand-wine);">
+                    <tr>
+                        <th>Subject Code</th>
+                        <th>Subject Name</th>
+                        <th>Class Mark (30%)</th>
+                        <th>Exam Mark (70%)</th>
+                        <th>Total Score</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <td class="fw-bold">{{ report.subject_code }}</td>
+                        <td>{{ report.subject_name }}</td>
+                        <td>{{ report.class_score }}</td>
+                        <td>{{ report.exam_score }}</td>
+                        <td class="fw-bold">{{ report.total_score }}</td>
+                        <td><span class="badge bg-success">{{ report.grade }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No examination results recorded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

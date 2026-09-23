@@ -1,0 +1,29 @@
+{% extends 'portal/base.html' %}
+
+{% block title %}Batch Excel Upload - {{ branding.school_name }}{% endblock %}
+
+{% block content %}
+<h3 class="fw-bold text-secondary mb-4">Batch Excel Upload</h3>
+
+<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width: 550px;">
+    <div class="card-header text-white fw-bold py-3" style="background-color: var(--brand-wine);">
+        Upload Excel Spreadsheet
+    </div>
+    <div class="card-body p-4 text-center">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success p-2 small">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-4">
+                <i class="fa-solid fa-file-excel text-success display-3 mb-3"></i>
+                <input type="file" name="excel_file" class="form-control" accept=".xlsx, .xls" required>
+            </div>
+            <button type="submit" class="btn text-white w-100 fw-bold py-2" style="background-color: var(--brand-wine);">Upload & Process Data</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

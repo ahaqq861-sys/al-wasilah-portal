@@ -1,0 +1,40 @@
+{% extends 'portal/base.html' %}
+
+{% block title %}School Fees Ledger - {{ branding.school_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-secondary mb-0">Student Fees & Payment Ledger</h3>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead class="table-dark" style="background-color: var(--brand-wine);">
+                    <tr>
+                        <th>Description</th>
+                        <th>Amount Due (GHS)</th>
+                        <th>Amount Paid (GHS)</th>
+                        <th>Balance (GHS)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in ledgers %}
+                    <tr>
+                        <td>{{ entry.description }}</td>
+                        <td>{{ entry.amount_due }}</td>
+                        <td>{{ entry.amount_paid }}</td>
+                        <td class="fw-bold {% if entry.balance > 0 %}text-danger{% else %}text-success{% endif %}">{{ entry.balance }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">No fee entries found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

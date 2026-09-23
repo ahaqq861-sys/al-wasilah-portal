@@ -22,7 +22,6 @@
             overflow-x: hidden;
         }
 
-        /* Sidebar Styling */
         .sidebar {
             width: var(--sidebar-width);
             height: 100vh;
@@ -48,19 +47,17 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .sidebar-header i {
-            color: var(--brand-gold);
-        }
+        .sidebar-header i { color: var(--brand-gold); }
 
         .user-profile-section {
-            padding: 25px 15px;
+            padding: 20px 15px;
             text-align: center;
             background-color: var(--brand-wine-dark);
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .user-avatar-icon {
-            font-size: 2.8rem;
+            font-size: 2.5rem;
             color: var(--brand-gold);
             margin-bottom: 5px;
         }
@@ -68,14 +65,14 @@
         .user-name {
             font-weight: bold;
             color: var(--brand-gold);
-            font-size: 1.05rem;
+            font-size: 1rem;
             margin-bottom: 4px;
         }
 
         .user-badge {
             background-color: var(--brand-gold);
             color: #000000;
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 800;
             padding: 3px 10px;
             border-radius: 12px;
@@ -86,19 +83,20 @@
         .sidebar-menu {
             list-style: none;
             padding: 0;
-            margin: 15px 0 0 0;
+            margin: 10px 0 0 0;
             flex-grow: 1;
+            overflow-y: auto;
         }
 
         .sidebar-menu li a {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 25px;
+            padding: 12px 20px;
             color: #d1d5db;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             transition: all 0.2s ease;
         }
 
@@ -107,11 +105,8 @@
             color: var(--brand-gold);
         }
 
-        .sidebar-menu li a i {
-            width: 20px;
-        }
+        .sidebar-menu li a i { width: 20px; }
 
-        /* Top Bar Styling */
         .top-navbar {
             margin-left: var(--sidebar-width);
             height: 60px;
@@ -126,7 +121,7 @@
 
         .top-navbar-title {
             font-weight: 700;
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -137,14 +132,12 @@
             opacity: 0.9;
         }
 
-        /* Main Content Layout */
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 25px;
             min-height: calc(100vh - 60px);
         }
 
-        /* Common Custom Cards */
         .metric-card {
             border: none;
             border-radius: 8px;
@@ -154,21 +147,9 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         }
 
-        .metric-card-wine {
-            background-color: var(--brand-wine);
-        }
-
-        .metric-card-white {
-            background-color: #ffffff;
-            color: #333333;
-            border-left: 4px solid var(--brand-gold);
-        }
-
-        .metric-card-green {
-            background-color: #ffffff;
-            color: #333333;
-            border-left: 4px solid #198754;
-        }
+        .metric-card-wine { background-color: var(--brand-wine); }
+        .metric-card-white { background-color: #ffffff; color: #333333; border-left: 4px solid var(--brand-gold); }
+        .metric-card-green { background-color: #ffffff; color: #333333; border-left: 4px solid #198754; }
 
         .metric-label {
             font-size: 0.75rem;
@@ -179,23 +160,9 @@
             margin-bottom: 5px;
         }
 
-        .metric-card-white .metric-label, .metric-card-green .metric-label {
-            color: #6c757d;
-        }
-
-        .metric-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-        }
-
-        .metric-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 2.2rem;
-            opacity: 0.8;
-        }
+        .metric-card-white .metric-label, .metric-card-green .metric-label { color: #6c757d; }
+        .metric-value { font-size: 1.4rem; font-weight: 800; }
+        .metric-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 2rem; opacity: 0.8; }
 
         .term-badge {
             background-color: var(--brand-wine);
@@ -203,13 +170,18 @@
             font-weight: 700;
             padding: 6px 16px;
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
         }
+
+        /* Calendar Styling */
+        .calendar-table { width: 100%; text-align: center; border-collapse: collapse; }
+        .calendar-table th { font-size: 0.75rem; color: #6c757d; text-transform: uppercase; padding: 6px 0; }
+        .calendar-table td { padding: 8px 0; font-size: 0.85rem; font-weight: 600; }
+        .calendar-table td.today { background-color: var(--brand-wine); color: #fff; border-radius: 50%; }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar Navigation -->
     <div class="sidebar">
         <div class="sidebar-header">
             <i class="fa-solid fa-graduation-cap"></i>
@@ -243,8 +215,26 @@
                     <span>School Fees Ledger</span>
                 </a>
             </li>
+            <li class="{% if request.resolver_match.url_name == 'register_users' %}active{% endif %}">
+                <a href="{% url 'portal:register_users' %}">
+                    <i class="fa-solid fa-user-plus"></i>
+                    <span>Register Users</span>
+                </a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'batch_excel_upload' %}active{% endif %}">
+                <a href="{% url 'portal:batch_excel_upload' %}">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>Batch Excel Upload</span>
+                </a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'portal_branding' %}active{% endif %}">
+                <a href="{% url 'portal:portal_branding' %}">
+                    <i class="fa-solid fa-sliders"></i>
+                    <span>Portal Branding</span>
+                </a>
+            </li>
             <li>
-                <a href="{% url 'logout' %}" class="text-danger-custom">
+                <a href="{% url 'logout' %}" class="text-danger">
                     <i class="fa-solid fa-right-from-bracket"></i>
                     <span>Logout</span>
                 </a>
@@ -252,7 +242,6 @@
         </ul>
     </div>
 
-    <!-- Top Navigation Bar -->
     <div class="top-navbar">
         <div class="top-navbar-title">
             <i class="fa-solid fa-school"></i>
@@ -264,7 +253,6 @@
         </div>
     </div>
 
-    <!-- Main Dynamic Content Area -->
     <div class="main-content">
         {% block content %}{% endblock %}
     </div>
