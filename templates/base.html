@@ -3,19 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ branding.school_name|default:"Al-Wasilah Portal" }}{% endblock %}</title>
+    <title>{% block title %}{{ branding.school_name|default:"Al-Wasilah Basic School" }}{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --uds-green: #1b8a44; --uds-dark: #2c3e50; --uds-sidebar: #222d32; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; }
-        .sidebar { min-height: 100vh; background-color: var(--uds-sidebar); color: #fff; }
-        .sidebar .nav-link { color: #b8c7ce; padding: 12px 20px; font-size: 14px; border-left: 3px solid transparent; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #1e282c; color: #fff; border-left-color: var(--uds-green); }
-        .top-navbar { background-color: var(--uds-green); color: white; padding: 10px 20px; }
-        .brand-header { background-color: #156d35; padding: 15px; text-align: center; font-weight: bold; }
-        .main-content { padding: 25px; }
-        .card-header-green { background-color: var(--uds-green); color: white; font-weight: bold; }
+        :root {
+            --school-wine: #6b1d2f;
+            --school-wine-dark: #4a1320;
+            --school-gold: #d4af37;
+            --school-bg: #f8f9fa;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--school-bg); }
+        
+        .sidebar { min-height: 100vh; background-color: var(--school-wine-dark); color: #fff; }
+        .sidebar .nav-link { 
+            color: #e0d0d4; 
+            padding: 14px 20px; 
+            font-size: 15px; 
+            font-weight: 500;
+            border-left: 4px solid transparent; 
+            transition: all 0.2s;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { 
+            background: var(--school-wine); 
+            color: var(--school-gold); 
+            border-left-color: var(--school-gold); 
+        }
+        .brand-header { 
+            background-color: var(--school-wine); 
+            padding: 20px 15px; 
+            text-align: center; 
+            font-weight: bold;
+            border-bottom: 3px solid var(--school-gold);
+        }
+        .top-navbar { 
+            background-color: var(--school-wine); 
+            color: white; 
+            padding: 12px 25px; 
+            border-bottom: 2px solid var(--school-gold);
+        }
+        .main-content { padding: 30px; }
+        .card-header-wine { 
+            background-color: var(--school-wine); 
+            color: white; 
+            font-weight: bold; 
+        }
+        .badge-gold {
+            background-color: var(--school-gold);
+            color: #000;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -24,26 +61,32 @@
         <!-- Sidebar Navigation -->
         <div class="col-md-2 sidebar d-none d-md-block">
             <div class="brand-header">
-                <i class="fa-solid fa-graduation-cap me-2"></i> {{ branding.school_name|default:"UCM Enterprise" }}
+                <i class="fa-solid fa-graduation-cap me-2 text-warning"></i> 
+                <span>{{ branding.school_name|default:"Al-Wasilah Portal" }}</span>
             </div>
+            
             <div class="p-3 text-center border-bottom border-secondary">
-                <i class="fa-solid fa-user-circle fa-2x mb-1"></i>
-                <div class="small fw-bold text-truncate">{{ request.user.get_full_name|default:request.user.username }}</div>
+                <i class="fa-solid fa-user-gear fa-2x mb-2 text-warning"></i>
+                <div class="fw-bold text-truncate" style="color: var(--school-gold);">
+                    {{ request.user.get_full_name|default:request.user.username }}
+                </div>
+                <span class="badge badge-gold mt-1">BASIC SCHOOL</span>
             </div>
-            <ul class="nav flex-column mt-2">
+
+            <ul class="nav flex-column mt-3">
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'portal:dashboard' %}">
-                        <i class="fa-solid fa-gauge me-2"></i> Dashboard
+                        <i class="fa-solid fa-house me-2"></i> Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'results' %}active{% endif %}" href="{% url 'portal:results' %}">
-                        <i class="fa-solid fa-file-invoice me-2"></i> Statement of Results
+                        <i class="fa-solid fa-file-lines me-2"></i> Terminal Report
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'school_fees' %}active{% endif %}" href="{% url 'portal:school_fees' %}">
-                        <i class="fa-solid fa-wallet me-2"></i> School Fees Ledger
+                        <i class="fa-solid fa-receipt me-2"></i> School Fees Ledger
                     </a>
                 </li>
                 <li class="nav-item mt-4">
@@ -56,9 +99,9 @@
 
         <!-- Main Content Area -->
         <div class="col-md-10">
-            <div class="top-navbar d-flex justify-content-between align-items-center">
-                <div><i class="fa-solid fa-bars me-2"></i> Academic Portal System</div>
-                <div class="small"><i class="fa-solid fa-calendar-day me-1"></i> {% now "l, d-M-Y" %}</div>
+            <div class="top-navbar d-flex justify-content-between align-items-center shadow-sm">
+                <div class="fw-bold fs-5"><i class="fa-solid fa-school me-2"></i> Al-Wasilah Basic School Portal</div>
+                <div class="small text-light"><i class="fa-solid fa-calendar-day me-1"></i> {% now "l, d F Y" %}</div>
             </div>
             <div class="main-content">
                 {% block content %}{% endblock %}
@@ -66,6 +109,6 @@
         </div>
     </div>
 </div>
-<script href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
