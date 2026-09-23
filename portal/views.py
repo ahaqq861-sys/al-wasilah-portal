@@ -15,6 +15,10 @@ def login_view(request):
     if not branding:
         branding = SchoolBranding.objects.create()
 
+    # Automatically create default admin if no superuser exists
+    if not User.objects.filter(is_superuser=True).exists():
+        User.objects.create_superuser('admin', 'admin@alwasilah.com', 'admin123')
+
     if request.user.is_authenticated:
         return redirect('portal:dashboard')
 
@@ -145,6 +149,7 @@ def portal_branding(request):
         branding.postal_address = request.POST.get('postal_address', branding.postal_address)
         branding.phone_numbers = request.POST.get('phone_numbers', branding.phone_numbers)
         branding.email = request.POST.get('email', branding.email)
+        branding.primary_color = request.POST.get('primary_color', branding.primary_color)
         branding.current_academic_year = request.POST.get('current_academic_year', branding.current_academic_year)
         branding.current_term = request.POST.get('current_term', branding.current_term)
         branding.save()

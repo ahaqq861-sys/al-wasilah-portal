@@ -2,15 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class SchoolBranding(models.Model):
-    school_name = models.CharField(max_length=255, default="AL WASILAH SCHOOL COMPLEX")
+    school_name = models.CharField(max_length=255, default="AL-WASILAH SCHOOL COMPLEX")
     motto = models.CharField(max_length=255, default="Knowledge and Excellence")
-    postal_address = models.CharField(max_length=255, blank=True, null=True, default="P.O. Box 123")
-    phone_numbers = models.CharField(max_length=100, blank=True, null=True, default="0240000000")
-    email = models.EmailField(blank=True, null=True, default="info@alwasilah.com")
-    primary_color = models.CharField(max_length=10, default="#1e7e34")
+    postal_address = models.CharField(max_length=255, blank=True, null=True, default="P.O. Box 123, Tamale")
+    phone_numbers = models.CharField(max_length=100, blank=True, null=True, default="+233 24 000 0000 / +233 20 000 0000")
+    email = models.EmailField(blank=True, null=True, default="info@alwasilah.edu.gh")
+    primary_color = models.CharField(max_length=10, default="#800020")  # Wine Color
     secondary_color = models.CharField(max_length=10, default="#ffffff")
     logo = models.ImageField(upload_to='branding/', blank=True, null=True)
-    logo_url = models.URLField(blank=True, null=True)
+    logo_url = models.URLField(blank=True, null=True, default="https://via.placeholder.com/120?text=Logo")
     current_academic_year = models.CharField(max_length=20, default="2026/2027")
     current_term = models.CharField(max_length=50, default="FIRST TRIMESTER")
 
