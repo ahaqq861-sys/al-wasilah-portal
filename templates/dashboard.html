@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | {{ branding.school_name }}{% endblock %}
+
+{% block content %}
+<h3 class="mb-4">Dashboard</h3>
+
+<!-- Status Widgets -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h5>Academic Status</h5>
+                    <p class="mb-0 fw-bold">Active</p>
+                </div>
+                <i class="fa-solid fa-user-check fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h5>Current Level</h5>
+                    <p class="mb-0 fw-bold">{{ student.get_class_level_display|default:"Level 400" }}</p>
+                </div>
+                <i class="fa-solid fa-layer-group fa-2x"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Schedule -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header card-header-green">
+                Lecture Schedule - {% now "l, d-M-Y" %}
+            </div>
+            <div class="card-body">
+                <p class="text-muted">No scheduled lectures for today.</p>
+            </div>
+        </div>
+    </div>
+    <!-- Calendar Widget -->
+    <div class="col-md-4">
+        <div class="card text-white bg-dark">
+            <div class="card-header bg-success text-center font-bold">Current Schedule</div>
+            <div class="card-body text-center">
+                <h4>{{ branding.current_academic_year }}</h4>
+                <p>{{ branding.current_term }}</p>
+                <button class="btn btn-outline-light btn-sm">View Timetable</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

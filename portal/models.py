@@ -57,31 +57,59 @@ class AcademicTerm(models.Model):
 
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='student_data')
-    student_id = models.CharField(max_length=30, unique=True)
+    index_number = models.CharField(max_length=30, unique=True)
+    uin = models.CharField(max_length=30, unique=True, blank=True, null=True)
     class_level = models.CharField(max_length=20, choices=CLASS_LEVEL_CHOICES)
+    gender = models.CharField(max_length=10, choices=(('MALE', 'Male'), ('FEMALE', 'Female')), default='MALE')
+    nationality = models.CharField(max_length=50, default='GHANAIAN')
+    fee_category = models.CharField(max_length=30, default='REGULAR')
+    program_name = models.CharField(max_length=100, default='BASIC EDUCATION')
     parent = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='children')
     date_of_birth = models.DateField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.get_full_name() or self.user.username} [{self.student_id}]"
+        return f"{self.user.get_full_name() or self.user.username} [{self.index_number}]"
 
 class GradeReport(models.Model):
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='grades')
-    subject = models.CharField(max_length=100)
+    subject_code = models.CharField(max_length=20, default='SUB101')
+    subject_name = models.CharField(max_length=100)
+    credit_hours = models.IntegerField(default=3)
     class_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     exam_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    total_mark = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
+    grade = models.CharField(max_length=5, default='A')
     term = models.ForeignKey(AcademicTerm, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
 
-    def __str__(self):
-        return f"{self.student} - {self.subject}"
+    def save(self, *args, **kwargs):
+        self.total_mark = self.class_score + self.exam_score
+        if self.total_mark >= 80:
+            self.grade = 'A'
+        elif self.total_mark >= 70:
+            self.grade = 'B'
+        elif self.total_mark >= 60:
+            self.grade = 'C'
+        elif self.total_mark >= 50:
+            self.grade = 'D'
+        else:
+            self.grade = 'F'
+        super().save(*args, **kwargs)
 
-class FeeStatement(models.Model):
-    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='fees')
-    term = models.ForeignKey(AcademicTerm, on_delete=models.CASCADE)
-    total_billed = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
-    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
-    last_updated = models.DateTimeField(default=timezone.now)
+    def __str__(self):
+        return f"{self.student} - {self.subject_name}"
+
+class LedgerEntry(models.Model):
+    ENTRY_TYPES = (
+        ('BILLING', 'Billing'),
+        ('PAYMENT', 'Payment'),
+    )
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE, related_name='ledger_entries')
+    academic_year = models.CharField(max_length=20, default='2025/2026')
+    date = models.DateField(default=timezone.now)
+    entry_type = models.CharField(max_length=10, choices=ENTRY_TYPES)
+    narration = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"Fees: {self.student}"
+        return f"{self.student} - {self.entry_type} - GH¢{self.amount}"
