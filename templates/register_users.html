@@ -1,49 +1,82 @@
-{% extends 'portal/base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Users - {{ branding.school_name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-success mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="{% url 'portal:dashboard' %}">{{ branding.school_name }}</a>
+  </div>
+</nav>
 
-{% block content %}
-<div class="top-navbar d-flex justify-content-between align-items-center mb-4 rounded">
-    <h4>Register Users</h4>
-    <span>Home / Register Users</span>
-</div>
+<div class="container">
+    <div class="card shadow-sm mx-auto" style="max-width: 650px;">
+        <div class="card-header bg-success text-white fw-bold">Register New Account</div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info p-2 small">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
 
-<div class="card border-0 shadow-sm p-4 col-md-8 mx-auto">
-    <h5 class="fw-bold mb-3">Add New Student or Teacher</h5>
-    <form method="POST">
-        {% csrf_token %}
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">First Name</label>
-                <input type="text" name="first_name" class="form-control" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Last Name</label>
-                <input type="text" name="last_name" class="form-control" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Password</label>
-                <input type="password" name="password" class="form-control" required>
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">User Role</label>
-                <select name="role" class="form-select" required>
-                    <option value="student">Student</option>
-                    <option value="teacher">Teacher</option>
-                </select>
-            </div>
-            <div class="col-12">
-                <label class="form-label">Index Number or Class Assigned</label>
-                <input type="text" name="identifier" class="form-control" placeholder="e.g. BPM/0022/23 or Form 1 A" required>
-            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Username</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">First Name</label>
+                        <input type="text" name="first_name" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Last Name</label>
+                        <input type="text" name="last_name" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Role</label>
+                        <select name="role" class="form-select">
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Assigned Class</label>
+                        <input type="text" name="assigned_class" class="form-control" placeholder="e.g. Basic 1">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Index Number (Student)</label>
+                        <input type="text" name="index_number" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">UIN (Student)</label>
+                        <input type="text" name="uin" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Staff ID (Teacher)</label>
+                        <input type="text" name="staff_id" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Parent Name</label>
+                        <input type="text" name="parent_name" class="form-control">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label fw-bold">Parent Contact</label>
+                        <input type="text" name="parent_contact" class="form-control">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success w-100 fw-bold mt-4">Save Account</button>
+            </form>
         </div>
-        <button type="submit" class="btn btn-success mt-3 w-100"><i class="fa fa-user-plus me-1"></i> Register Account</button>
-    </form>
+    </div>
 </div>
-{% endblock %}
+</body>
+</html>

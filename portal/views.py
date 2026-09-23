@@ -5,7 +5,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import SchoolBranding, GradeReport, FeeLedger, StudentProfile, TeacherProfile, LedgerEntry
+from .models import (
+    SchoolBranding, GradeReport, FeeLedger, StudentProfile, 
+    TeacherProfile, LedgerEntry, SchoolDocument, UserProfile
+)
 
 def login_view(request):
     branding = SchoolBranding.objects.first()
@@ -88,17 +91,36 @@ def register_users(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         role = request.POST.get('role')
-        index_or_class = request.POST.get('identifier')
+        
+        index_number = request.POST.get('index_number', 'N/A')
+        uin = request.POST.get('uin', '')
+        assigned_class = request.POST.get('assigned_class', 'General')
+        staff_id = request.POST.get('staff_id', '')
+        parent_name = request.POST.get('parent_name', '')
+        parent_contact = request.POST.get('parent_contact', '')
 
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists!")
         else:
             user = User.objects.create_user(username=username, first_name=first_name, last_name=last_name, email=email, password=password)
+            UserProfile.objects.create(user=user, role=role)
+
             if role == 'student':
-                StudentProfile.objects.create(user=user, index_number=index_or_class, assigned_class="General")
+                StudentProfile.objects.create(
+                    user=user, 
+                    index_number=index_number, 
+                    uin=uin,
+                    assigned_class=assigned_class,
+                    parent_name=parent_name,
+                    parent_contact=parent_contact
+                )
             elif role == 'teacher':
-                TeacherProfile.objects.create(user=user, assigned_class=index_or_class)
-            messages.success(request, f"User {username} created successfully!")
+                TeacherProfile.objects.create(
+                    user=user, 
+                    staff_id=staff_id,
+                    assigned_class=assigned_class
+                )
+            messages.success(request, f"User {username} registered successfully!")
             return redirect('portal:register_users')
 
     return render(request, 'portal/register_users.html', {'branding': branding})
@@ -107,7 +129,7 @@ def register_users(request):
 def batch_excel_upload(request):
     branding = SchoolBranding.objects.first()
     if request.method == 'POST' and request.FILES.get('excel_file'):
-        messages.success(request, "Excel data processed successfully!")
+        messages.success(request, "Excel batch upload processed successfully!")
         return redirect('portal:batch_excel_upload')
     return render(request, 'portal/batch_excel_upload.html', {'branding': branding})
 
