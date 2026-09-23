@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | {{ branding.school_name|default:"Al-Wasilah School Complex" }}</title>
+    <title>Login | AL-WASILAH SCHOOL COMPLEX</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -19,46 +19,76 @@
             align-items: center;
             justify-content: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 10px;
         }
         .login-card {
             width: 100%;
-            max-width: 440px;
+            max-width: 460px;
             border: none;
             border-radius: 16px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
             overflow: hidden;
             background: #ffffff;
         }
         .login-header {
             background-color: var(--school-wine);
             color: #ffffff;
-            padding: 30px 20px;
+            padding: 25px 20px 20px 20px;
             text-align: center;
             border-bottom: 4px solid var(--school-gold);
         }
-        .school-icon {
-            font-size: 3rem;
-            color: var(--school-gold);
-            margin-bottom: 10px;
+        .crest-badge {
+            width: 90px;
+            height: 90px;
+            background-color: white;
+            border-radius: 50%;
+            padding: 5px;
+            margin: 0 auto 12px auto;
+            border: 3px solid var(--school-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .crest-badge i {
+            color: var(--school-wine);
+            font-size: 2.8rem;
+        }
+        .motto-banner {
+            background-color: var(--school-gold);
+            color: #000;
+            font-weight: 800;
+            font-size: 0.70rem;
+            letter-spacing: 0.8px;
+            padding: 5px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 8px;
+            text-transform: uppercase;
         }
         .login-body {
-            padding: 35px 30px;
+            padding: 30px 25px 20px 25px;
         }
         .btn-wine {
             background-color: var(--school-wine);
             color: white;
-            font-weight: 600;
+            font-weight: 700;
             padding: 12px;
             border-radius: 8px;
             transition: all 0.3s ease;
+            border: none;
         }
         .btn-wine:hover {
             background-color: var(--school-wine-dark);
             color: var(--school-gold);
         }
-        .form-control:focus {
-            border-color: var(--school-wine);
-            box-shadow: 0 0 0 0.25rem rgba(107, 29, 47, 0.25);
+        .contact-info {
+            font-size: 0.78rem;
+            color: #6c757d;
+            background-color: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            padding: 15px;
+            text-align: center;
         }
     </style>
 </head>
@@ -66,18 +96,19 @@
 
 <div class="login-card">
     <div class="login-header">
-        <i class="fa-solid fa-school school-icon"></i>
-        <h4 class="fw-bold mb-1">{{ branding.school_name|default:"AL-WASILAH SCHOOL COMPLEX" }}</h4>
-        <small class="text-light" style="font-size: 0.85rem; letter-spacing: 0.5px;">
-            {{ branding.motto|default:"Knowledge, Virtue & Excellence" }}
-        </small>
+        <div class="crest-badge">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <h4 class="fw-bold mb-0 text-white" style="letter-spacing: 0.5px;">AL-WASILAH</h4>
+        <div class="fw-semibold text-white-50 small mb-1">SCHOOL COMPLEX</div>
+        <div class="motto-banner">KNOWLEDGE, INTEGRITY AND EXCELLENCE</div>
     </div>
     
     <div class="login-body">
-        <h5 class="text-center text-muted mb-4 fw-semibold">Basic School Portal Login</h5>
+        <h6 class="text-center text-muted mb-4 fw-semibold">Basic School Student & Staff Portal</h6>
         
         {% if error %}
-            <div class="alert alert-danger d-flex align-items-center py-2" role="alert">
+            <div class="alert alert-danger d-flex align-items-center py-2 fs-6" role="alert">
                 <i class="fa-solid fa-circle-exclamation me-2"></i>
                 <div>{{ error }}</div>
             </div>
@@ -90,7 +121,7 @@
                 <label for="username" class="form-label fw-bold small text-secondary">Username / Student Index No.</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light"><i class="fa-solid fa-user text-muted"></i></span>
-                    <input type="text" name="username" class="form-control" placeholder="e.g. AWS/2026/001" required>
+                    <input type="text" name="username" class="form-control" placeholder="e.g. admin or AWS/2026/001" required>
                 </div>
             </div>
 
@@ -102,14 +133,16 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-wine w-100 mb-3">
-                <i class="fa-solid fa-right-to-bracket me-2"></i> Sign In to Portal
+            <button type="submit" class="btn btn-wine w-100 mb-2">
+                <i class="fa-solid fa-right-to-bracket me-2"></i> Sign In
             </button>
         </form>
     </div>
     
-    <div class="card-footer text-center bg-light py-3 border-0">
-        <small class="text-muted">&copy; {% now "Y" %} {{ branding.school_name|default:"Al-Wasilah School Complex" }}. All Rights Reserved.</small>
+    <div class="contact-info">
+        <div class="fw-bold mb-1" style="color: var(--school-wine);"><i class="fa-solid fa-location-dot me-1"></i> P.O.Box 161 TL, Tamale</div>
+        <div><i class="fa-solid fa-phone me-1"></i> 0244963410 / 0246849302 / 0243881080</div>
+        <div><i class="fa-solid fa-envelope me-1"></i> alwasilaschool2026@gmail.com</div>
     </div>
 </div>
 
