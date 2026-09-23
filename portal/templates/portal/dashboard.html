@@ -1,44 +1,109 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - {{ branding.school_name }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .navbar-wine { background-color: {{ branding.primary_color|default:"#800020" }}; }
-        .dash-logo { width: 45px; height: 45px; object-fit: contain; background: #fff; border-radius: 50%; padding: 2px; }
-    </style>
-</head>
-<body class="bg-light">
+{% extends 'portal/base.html' %}
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-wine shadow-sm">
-  <div class="container-fluid">
-    <a class="navbar-brand d-flex align-items-center fw-bold" href="{% url 'portal:dashboard' %}">
-      {% if branding.logo %}
-          <img src="{{ branding.logo.url }}" alt="Logo" class="dash-logo me-2">
-      {% elif branding.logo_url %}
-          <img src="{{ branding.logo_url }}" alt="Logo" class="dash-logo me-2">
-      {% endif %}
-      <span>{{ branding.school_name }}</span>
-    </a>
-    <div>
-      <a href="{% url 'portal:terminal_results' %}" class="btn btn-outline-light btn-sm me-1">Terminal Results</a>
-      <a href="{% url 'portal:student_ledger' %}" class="btn btn-outline-light btn-sm me-1">Student Ledger</a>
-      <a href="{% url 'portal:register_users' %}" class="btn btn-outline-light btn-sm me-1">Register Users</a>
-      <a href="{% url 'portal:portal_branding' %}" class="btn btn-outline-light btn-sm me-1">Branding Settings</a>
-      <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Logout</a>
-    </div>
-  </div>
-</nav>
+{% block title %}Dashboard - {{ branding.school_name }}{% endblock %}
 
-<div class="container mt-4">
-    <div class="card p-4 shadow-sm border-0">
-        <h3 class="fw-bold" style="color: {{ branding.primary_color|default:'#800020' }};">Welcome to {{ branding.school_name }}</h3>
-        <p class="text-muted mb-1">Academic Year: <strong>{{ academic_year }}</strong> | Term: <strong>{{ current_term }}</strong></p>
-        <p class="text-muted mb-0">Today: <strong>{{ today_day_name }}, {{ today_date_str }}</strong></p>
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold text-secondary mb-0">Student & Parent Portal</h3>
+    <div class="term-badge">
+        {{ academic_year|default:"2025/2026" }} - {{ current_term|default:"Term 1" }}
     </div>
 </div>
 
-</body>
-</html>
+<!-- Top Metrics Cards Row -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="metric-card metric-card-wine">
+            <div class="metric-label">CURRENT CLASS LEVEL</div>
+            <div class="metric-value">Primary / JHS</div>
+            <i class="fa-solid fa-people-group metric-icon" style="color: var(--brand-gold);"></i>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="metric-card metric-card-white">
+            <div class="metric-label">INDEX NUMBER</div>
+            <div class="metric-value text-dark">AWS/2026/001</div>
+            <i class="fa-solid fa-id-card metric-icon text-muted"></i>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="metric-card metric-card-green">
+            <div class="metric-label">ENROLLMENT STATUS</div>
+            <div class="metric-value text-success">Active Student</div>
+            <i class="fa-solid fa-user-check metric-icon text-success"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Announcements and Quick Actions Grid -->
+<div class="row g-4">
+    <!-- Left Column: Announcements -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header text-white d-flex justify-content-between align-items-center py-3" style="background-color: var(--brand-wine);">
+                <span class="fw-bold fs-6 me-2"><i class="fa-solid fa-bullhorn me-2"></i>School Announcements</span>
+                <span class="badge bg-warning text-dark px-3 py-2 fw-bold" style="border-radius: 4px;">Notice</span>
+            </div>
+            <div class="card-body p-4">
+                <!-- Announcement Item 1 -->
+                <div class="d-flex gap-3 align-items-start mb-4 pb-3 border-bottom">
+                    <div class="p-3 bg-light text-danger rounded-3 fs-4">
+                        <i class="fa-regular fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Terminal Examinations Notice</h6>
+                        <p class="text-muted small mb-0">
+                            End-of-term examinations for KG 1 to JHS 3 will commence as scheduled. All fee balances should be settled prior to the exam date.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Announcement Item 2 -->
+                <div class="d-flex gap-3 align-items-start">
+                    <div class="p-3 bg-light text-warning rounded-3 fs-4 me-1">
+                        <i class="fa-solid fa-bus"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">PTA Meeting & School Transport</h6>
+                        <p class="text-muted small mb-0">
+                            Parents are reminded of the upcoming PTA meeting this month. School bus pickup routes remain unchanged.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Portal Quick Actions -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-header text-white py-3" style="background-color: #2b3035;">
+                <span class="fw-bold fs-6"><i class="fa-solid fa-link me-2"></i>Portal Quick Actions</span>
+            </div>
+            <div class="card-body p-3">
+                <a href="{% url 'portal:terminal_results' %}" class="d-flex align-items-center gap-3 p-3 text-decoration-none text-dark bg-light rounded-3 mb-3 border hover-shadow">
+                    <div class="p-2 text-danger fs-4 me-1">
+                        <i class="fa-regular fa-file-pdf"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">Terminal Report</div>
+                        <div class="text-muted small">View terminal exam scores & grades</div>
+                    </div>
+                </a>
+
+                <a href="{% url 'portal:student_ledger' %}" class="d-flex align-items-center gap-3 p-3 text-decoration-none text-dark bg-light rounded-3 border hover-shadow">
+                    <div class="p-2 text-success fs-4 me-1">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark">School Fees Ledger</div>
+                        <div class="text-muted small">Check payment history & balance</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
