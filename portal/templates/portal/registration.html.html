@@ -1,0 +1,108 @@
+{% extends 'portal/base.html' %}
+{% block page_title %}User Registration{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-5 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="fw-bold text-dark mb-3">Register New User</h5>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Username / Index No.</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">First Name</label>
+                            <input type="text" name="first_name" class="form-control" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Last Name</label>
+                            <input type="text" name="last_name" class="form-control" required>
+                        </div>
+                    </div>
+                    {% if profile.role == 'admin' %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Account Role</label>
+                        <select name="role" class="form-select">
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Assigned Class</label>
+                        <input type="text" name="assigned_class" class="form-control" placeholder="e.g. Primary 1">
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" name="can_brand_portal" class="form-check-input" id="brandCheck">
+                        <label class="form-check-label" for="brandCheck">Grant Portal Branding Approval</label>
+                    </div>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Age</label>
+                            <input type="number" name="age" class="form-control">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-semibold">Gender</label>
+                            <select name="gender" class="form-select">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Disability Status</label>
+                        <input type="text" name="disability_status" class="form-control" value="None">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Passport Picture</label>
+                        <input type="file" name="passport_picture" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary-brand w-100">Register User</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="fw-bold text-dark mb-3">Registered Accounts</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Username / Index</th>
+                                <th>Class</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in registered_users %}
+                            <tr>
+                                <td>
+                                    {% if u.passport_picture %}
+                                        <img src="{{ u.passport_picture.url }}" class="rounded-circle" width="40" height="40">
+                                    {% else %}
+                                        <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                                    {% endif %}
+                                </td>
+                                <td>{{ u.user.get_full_name }}</td>
+                                <td>{{ u.index_number }}</td>
+                                <td>{{ u.assigned_class }}</td>
+                                <td><span class="badge bg-secondary">{{ u.role|upper }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

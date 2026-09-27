@@ -1,0 +1,101 @@
+{% extends 'portal/base.html' %}
+{% block page_title %}Manage Student Results{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3 no-print">
+    <div>
+        {% if profile.role == 'admin' %}
+        <form method="GET" class="d-inline-flex align-items-center">
+            <select name="class_filter" class="form-select form-select-sm me-2" onchange="this.form.submit()">
+                <option value="">All Classes</option>
+                <option value="Primary 1">Primary 1</option>
+                <option value="Primary 2">Primary 2</option>
+                <option value="JHS 1">JHS 1</option>
+            </select>
+        </form>
+        {% endif %}
+    </div>
+    <div>
+        <button class="btn btn-secondary me-2" onclick="window.print()"><i class="fas fa-print me-1"></i> Print Report</button>
+        <button class="btn btn-primary-brand" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fas fa-plus me-1"></i> Upload Result</button>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <h5 class="fw-bold text-dark mb-3">Recorded Academic Results</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Index No.</th>
+                        <th>Class</th>
+                        <th>Subject</th>
+                        <th>Class Score (40%)</th>
+                        <th>Exam Score (60%)</th>
+                        <th>Total (100%)</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in results %}
+                    <tr>
+                        <td>{{ res.student.user.get_full_name }}</td>
+                        <td>{{ res.student.index_number }}</td>
+                        <td>{{ res.class_name }}</td>
+                        <td>{{ res.subject }}</td>
+                        <td>{{ res.class_score }}</td>
+                        <td>{{ res.exam_score }}</td>
+                        <td><strong>{{ res.total_score }}</strong></td>
+                        <td><span class="badge bg-success">{{ res.grade }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" class="text-center text-muted">No academic results found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade no-print" id="uploadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Student Result</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Select Student</label>
+                    <select name="student_id" class="form-select" required>
+                        {% for st in students %}
+                            <option value="{{ st.id }}">{{ st.user.get_full_name }} ({{ st.assigned_class }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Subject</label>
+                    <input type="text" name="subject" class="form-control" required>
+                </div>
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Class Score (40)</label>
+                        <input type="number" step="0.1" name="class_score" class="form-control" required>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label">Exam Score (60)</label>
+                        <input type="number" step="0.1" name="exam_score" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary-brand">Save Result</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

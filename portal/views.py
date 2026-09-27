@@ -1,228 +1,272 @@
-import calendar
-from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.contrib import messages
-from django.db.models import Sum
-from .models import PortalBranding, UserProfile, StatementOfResult, FeeLedgerEntry
+from django.contrib.auth.models import User
+from .models import UserProfile, StudentResult, FeeLedgerEntry, PortalBranding
+
+def get_branding():
+    branding, _ = PortalBranding.objects.get_or_create(id=1)
+    return branding
 
 def login_view(request):
-    # Redirect if user is already logged in
     if request.user.is_authenticated:
         return redirect('portal:dashboard')
 
-    if request.method == 'POST':
-        # Accept username or index_number
-        username_input = request.POST.get('username') or request.POST.get('index_number')
-        password_input = request.POST.get('password')
+    branding = get_branding()
 
-        user = authenticate(request, username=username_input, password=password_input)
+    if request.method == 'POST':
+        identifier = request.POST.get('username', '').strip()
+        password_input = request.POST.get('password', '')
+
+        user = authenticate(request, username=identifier, password=password_input)
+
+        if user is None:
+            profile = UserProfile.objects.filter(index_number__iexact=identifier).first()
+            if profile:
+                user = authenticate(request, username=profile.user.username, password=password_input)
 
         if user is not None:
             login(request, user)
-            next_url = request.GET.get('next') or request.POST.get('next')
-            if next_url:
-                return redirect(next_url)
+            profile = user.profile
+            if profile.must_change_password:
+                return redirect('portal:change_password')
             return redirect('portal:dashboard')
         else:
             messages.error(request, "Invalid username/ID or password. Please try again.")
 
-    return render(request, 'portal/login.html')
+    return render(request, 'portal/login.html', {'branding': branding})
 
+
+@login_required
+def change_password_view(request):
+    branding = get_branding()
+    if request.method == 'POST':
+        new_pass = request.POST.get('new_password')
+        confirm_pass = request.POST.get('confirm_password')
+
+        if new_pass == '123456':
+            messages.error(request, "New password cannot be the default password '123456'.")
+        elif new_pass == confirm_pass:
+            request.user.set_password(new_pass)
+            request.user.save()
+            profile = request.user.profile
+            profile.must_change_password = False
+            profile.save()
+            update_session_auth_hash(request, request.user)
+            messages.success(request, "Password updated successfully!")
+            return redirect('portal:dashboard')
+        else:
+            messages.error(request, "Passwords do not match!")
+
+    return render(request, 'portal/change_password.html', {'branding': branding})
+
+
+@login_required
 def logout_view(request):
     logout(request)
-    messages.info(request, "You have been logged out successfully.")
-    return redirect('login')
+    return redirect('portal:login')
+
 
 @login_required
 def dashboard_view(request):
-    profile = getattr(request.user, 'profile', None)
-    branding = PortalBranding.objects.first()
-    
-    # Calendar construction
-    now = datetime.now()
-    cal = calendar.monthcalendar(now.year, now.month)
-    
+    profile = request.user.profile
+    branding = get_branding()
+
     context = {
-        'month_days': cal,
-        'today_day': now.day,
-        'month_name': now.strftime("%B"),
-        'current_year': now.year,
-        'today_day_name': now.strftime("%A"),
-        'today_date_str': now.strftime("%d-%b-%Y").upper(),
         'profile': profile,
+        'branding': branding,
     }
+
+    if profile.role == 'admin':
+        context['total_students'] = UserProfile.objects.filter(role='student').count()
+        context['total_teachers'] = UserProfile.objects.filter(role='teacher').count()
+    elif profile.role == 'teacher':
+        context['class_students'] = UserProfile.objects.filter(role='student', assigned_class=profile.assigned_class)
+    elif profile.role == 'student':
+        context['results'] = StudentResult.objects.filter(student=profile)
+        context['fee_entries'] = FeeLedgerEntry.objects.filter(student=profile)
+
     return render(request, 'portal/dashboard.html', context)
 
+
 @login_required
-def terminal_results(request):
-    profile = getattr(request.user, 'profile', None)
-    
-    # Students see only their results; admins/teachers see selected or default
-    if profile and profile.role == 'student':
-        results = StatementOfResult.objects.filter(student=request.user)
-        student_user = request.user
+def results_view(request):
+    profile = request.user.profile
+    branding = get_branding()
+
+    if profile.role == 'student':
+        results = StudentResult.objects.filter(student=profile)
+        return render(request, 'portal/student_results.html', {'results': results, 'branding': branding, 'profile': profile})
+
+    # For Admin and Teacher
+    if profile.role == 'teacher':
+        students = UserProfile.objects.filter(role='student', assigned_class=profile.assigned_class)
     else:
-        student_id = request.GET.get('student_id')
-        if student_id:
-            student_user = get_object_or_404(User, id=student_id)
+        selected_class = request.GET.get('class_filter', '')
+        if selected_class:
+            students = UserProfile.objects.filter(role='student', assigned_class=selected_class)
         else:
-            student_user = request.user
-        results = StatementOfResult.objects.filter(student=student_user)
+            students = UserProfile.objects.filter(role='student')
 
-    grouped_results = {}
-    for res in results:
-        key = f"{res.academic_year} - {res.trimester}"
-        if key not in grouped_results:
-            grouped_results[key] = []
-        grouped_results[key].append(res)
+    if request.method == 'POST':
+        student_id = request.POST.get('student_id')
+        subject = request.POST.get('subject')
+        class_score = float(request.POST.get('class_score', 0))
+        exam_score = float(request.POST.get('exam_score', 0))
+        academic_term = request.POST.get('academic_term', 'Term 1')
+        academic_year = request.POST.get('academic_year', '2026/2027')
 
-    context = {
-        'target_user': student_user,
-        'target_profile': getattr(student_user, 'profile', None),
-        'grouped_results': grouped_results,
-        'today_date_str': datetime.now().strftime("%d-%b-%Y"),
-    }
-    return render(request, 'portal/terminal_results.html', context)
+        target_student = get_object_or_404(UserProfile, id=student_id)
+        
+        StudentResult.objects.create(
+            student=target_student,
+            subject=subject,
+            class_name=target_student.assigned_class,
+            class_score=class_score,
+            exam_score=exam_score,
+            academic_term=academic_term,
+            academic_year=academic_year
+        )
+        messages.success(request, f"Result added for {target_student.user.get_full_name()}")
+        return redirect('portal:results')
+
+    results = StudentResult.objects.filter(student__in=students)
+    return render(request, 'portal/manage_results.html', {
+        'students': students,
+        'results': results,
+        'branding': branding,
+        'profile': profile
+    })
+
 
 @login_required
-def student_ledger(request):
-    profile = getattr(request.user, 'profile', None)
-    
-    if profile and profile.role == 'student':
-        student_user = request.user
-    else:
-        student_id = request.GET.get('student_id')
-        if student_id:
-            student_user = get_object_or_404(User, id=student_id)
-        else:
-            student_user = request.user
+def registration_view(request):
+    profile = request.user.profile
+    branding = get_branding()
 
-    entries = FeeLedgerEntry.objects.filter(student=student_user).order_by('date')
-    total_billing = entries.aggregate(Sum('billing'))['billing__sum'] or 0.00
-    total_payment = entries.aggregate(Sum('payment'))['payment__sum'] or 0.00
-    balance = total_billing - total_payment
-
-    context = {
-        'target_user': student_user,
-        'target_profile': getattr(student_user, 'profile', None),
-        'entries': entries,
-        'total_billing': total_billing,
-        'total_payment': total_payment,
-        'balance': balance,
-    }
-    return render(request, 'portal/student_ledger.html', context)
-
-@login_required
-def register_users(request):
-    profile = getattr(request.user, 'profile', None)
-    if profile and profile.role == 'student':
-        messages.error(request, "Access denied. Student accounts cannot register new users.")
+    if profile.role not in ['admin', 'teacher']:
+        messages.error(request, "Access Denied.")
         return redirect('portal:dashboard')
 
     if request.method == 'POST':
         username = request.POST.get('username')
-        password = request.POST.get('password')
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        role = request.POST.get('role', 'student')
-        
+        role = request.POST.get('role', 'student') if profile.role == 'admin' else 'student'
+        assigned_class = request.POST.get('assigned_class') if profile.role == 'admin' else profile.assigned_class
         index_number = request.POST.get('index_number')
-        uin = request.POST.get('uin')
-        gender = request.POST.get('gender', 'MALE')
-        age = request.POST.get('age') or None
-        dob = request.POST.get('date_of_birth') or None
-        disability = request.POST.get('disability_status', 'None')
-        programme = request.POST.get('programme', 'BASIC EDUCATION')
-        assigned_class = request.POST.get('assigned_class', 'Basic 1')
-        
-        guardian_name = request.POST.get('guardian_name')
-        guardian_phone = request.POST.get('guardian_phone')
-        guardian_rel = request.POST.get('guardian_relationship')
-        guardian_address = request.POST.get('guardian_address')
+        age = request.POST.get('age')
+        gender = request.POST.get('gender')
+        disability_status = request.POST.get('disability_status', 'None')
+        can_brand = True if request.POST.get('can_brand_portal') == 'on' else False
 
         if User.objects.filter(username=username).exists():
-            messages.error(request, f"Username '{username}' already exists.")
+            messages.error(request, "Username already exists!")
         else:
             user = User.objects.create_user(
                 username=username,
-                password=password,
+                password='123456',  # Default password
                 first_name=first_name,
-                last_name=last_name,
-                email=email
+                last_name=last_name
             )
             
-            user_prof = UserProfile.objects.create(
+            user_profile = UserProfile.objects.create(
                 user=user,
                 role=role,
-                index_number=index_number,
-                uin=uin,
-                gender=gender,
-                age=age,
-                date_of_birth=dob,
-                disability_status=disability,
-                programme=programme,
+                index_number=index_number or username,
                 assigned_class=assigned_class,
-                guardian_name=guardian_name,
-                guardian_phone=guardian_phone,
-                guardian_relationship=guardian_rel,
-                guardian_address=guardian_address,
+                age=int(age) if age else None,
+                gender=gender,
+                disability_status=disability_status,
+                can_brand_portal=can_brand,
+                must_change_password=True
             )
-            
-            if 'profile_picture' in request.FILES:
-                user_prof.profile_picture = request.FILES['profile_picture']
-                user_prof.save()
 
-            messages.success(request, f"User '{username}' ({role.upper()}) created successfully!")
-            return redirect('portal:register_users')
+            if 'passport_picture' in request.FILES:
+                user_profile.passport_picture = request.FILES['passport_picture']
+                user_profile.save()
 
-    return render(request, 'portal/register_users.html')
+            messages.success(request, f"Registered successfully! Username: {username} | Default Password: 123456")
+            return redirect('portal:registration')
 
-@login_required
-def batch_excel_upload(request):
-    profile = getattr(request.user, 'profile', None)
-    if profile and profile.role == 'student':
-        messages.error(request, "Access denied.")
-        return redirect('portal:dashboard')
+    if profile.role == 'teacher':
+        registered_users = UserProfile.objects.filter(assigned_class=profile.assigned_class)
+    else:
+        registered_users = UserProfile.objects.all()
 
-    if request.method == 'POST' and request.FILES.get('excel_file'):
-        messages.success(request, "Excel records uploaded and processed successfully!")
-        return redirect('portal:batch_excel_upload')
+    return render(request, 'portal/registration.html', {
+        'registered_users': registered_users,
+        'branding': branding,
+        'profile': profile
+    })
 
-    return render(request, 'portal/batch_excel_upload.html')
 
 @login_required
-def portal_branding(request):
-    profile = getattr(request.user, 'profile', None)
-    if profile and profile.role != 'admin':
-        messages.error(request, "Only portal Administrators can edit branding settings.")
-        return redirect('portal:dashboard')
+def fees_view(request):
+    profile = request.user.profile
+    branding = get_branding()
 
-    branding, _ = PortalBranding.objects.get_or_create(id=1)
+    if profile.role == 'student':
+        entries = FeeLedgerEntry.objects.filter(student=profile)
+        return render(request, 'portal/student_fees.html', {'entries': entries, 'branding': branding, 'profile': profile})
+
+    if profile.role == 'teacher':
+        students = UserProfile.objects.filter(role='student', assigned_class=profile.assigned_class)
+    else:
+        selected_class = request.GET.get('class_filter', '')
+        if selected_class:
+            students = UserProfile.objects.filter(role='student', assigned_class=selected_class)
+        else:
+            students = UserProfile.objects.filter(role='student')
+
+    if request.method == 'POST':
+        student_id = request.POST.get('student_id')
+        title = request.POST.get('title', 'School Fees')
+        amount_due = float(request.POST.get('amount_due', 0))
+        amount_paid = float(request.POST.get('amount_paid', 0))
+
+        target_student = get_object_or_404(UserProfile, id=student_id)
+
+        FeeLedgerEntry.objects.create(
+            student=target_student,
+            title=title,
+            amount_due=amount_due,
+            amount_paid=amount_paid,
+            recorded_by=request.user
+        )
+        messages.success(request, f"Fee payment recorded for {target_student.user.get_full_name()}")
+        return redirect('portal:fees')
+
+    fee_entries = FeeLedgerEntry.objects.filter(student__in=students)
+    return render(request, 'portal/manage_fees.html', {
+        'students': students,
+        'entries': fee_entries,
+        'branding': branding,
+        'profile': profile
+    })
+
+
+@login_required
+def branding_view(request):
+    profile = request.user.profile
+    branding = get_branding()
+
+    if profile.role != 'admin' and not profile.can_brand_portal:
+        messages.error(request, "Permission denied to edit portal branding.")
+        return redirect('portal:dashboard')
 
     if request.method == 'POST':
         branding.school_name = request.POST.get('school_name', branding.school_name)
-        branding.motto = request.POST.get('motto', branding.motto)
-        branding.primary_color = request.POST.get('primary_color', branding.primary_color)
-        branding.accent_color = request.POST.get('accent_color', branding.accent_color)
         branding.contact_email = request.POST.get('contact_email', branding.contact_email)
         branding.contact_phone = request.POST.get('contact_phone', branding.contact_phone)
         branding.address = request.POST.get('address', branding.address)
-        branding.current_academic_year = request.POST.get('current_academic_year', branding.current_academic_year)
-        branding.current_term = request.POST.get('current_term', branding.current_term)
 
         if 'logo' in request.FILES:
             branding.logo = request.FILES['logo']
 
         branding.save()
-        messages.success(request, "Portal branding and interface colors updated!")
-        return redirect('portal:portal_branding')
+        messages.success(request, "Portal branding updated successfully!")
+        return redirect('portal:branding')
 
-    return render(request, 'portal/portal_branding.html', {'branding': branding})
-
-@login_required
-def placeholder_view(request, title="Section"):
-    return render(request, 'portal/placeholder.html', {'title': title})
+    return render(request, 'portal/branding.html', {'branding': branding, 'profile': profile})
