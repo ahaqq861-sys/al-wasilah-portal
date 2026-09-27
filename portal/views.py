@@ -5,9 +5,11 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from .models import UserProfile, StudentResult, FeeLedgerEntry, PortalBranding
 
+
 def get_branding():
     branding, _ = PortalBranding.objects.get_or_create(id=1)
     return branding
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -28,7 +30,17 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            profile = user.profile
+            
+            # Safe Profile Lookup / Auto-creation to prevent RelatedObjectDoesNotExist
+            profile, created = UserProfile.objects.get_or_create(
+                user=user,
+                defaults={
+                    'role': 'admin' if user.is_superuser else 'student',
+                    'index_number': user.username,
+                    'must_change_password': False if user.is_superuser else True
+                }
+            )
+
             if profile.must_change_password:
                 return redirect('portal:change_password')
             return redirect('portal:dashboard')
@@ -99,7 +111,6 @@ def results_view(request):
         results = StudentResult.objects.filter(student=profile)
         return render(request, 'portal/student_results.html', {'results': results, 'branding': branding, 'profile': profile})
 
-    # For Admin and Teacher
     if profile.role == 'teacher':
         students = UserProfile.objects.filter(role='student', assigned_class=profile.assigned_class)
     else:
@@ -166,22 +177,24 @@ def registration_view(request):
         else:
             user = User.objects.create_user(
                 username=username,
-                password='123456',  # Default password
+                password='123456',
                 first_name=first_name,
                 last_name=last_name
             )
             
-            user_profile = UserProfile.objects.create(
+            user_profile = UserProfile.objects.get_or_create(
                 user=user,
-                role=role,
-                index_number=index_number or username,
-                assigned_class=assigned_class,
-                age=int(age) if age else None,
-                gender=gender,
-                disability_status=disability_status,
-                can_brand_portal=can_brand,
-                must_change_password=True
-            )
+                defaults={
+                    'role': role,
+                    'index_number': index_number or username,
+                    'assigned_class': assigned_class,
+                    'age': int(age) if age else None,
+                    'gender': gender,
+                    'disability_status': disability_status,
+                    'can_brand_portal': can_brand,
+                    'must_change_password': True
+                }
+            )[0]
 
             if 'passport_picture' in request.FILES:
                 user_profile.passport_picture = request.FILES['passport_picture']

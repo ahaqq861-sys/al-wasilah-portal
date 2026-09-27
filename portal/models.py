@@ -1,6 +1,9 @@
 import os
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 class PortalBranding(models.Model):
     school_name = models.CharField(max_length=255, default="Al-Wasilah School Complex")
@@ -40,7 +43,7 @@ class UserProfile(models.Model):
     assigned_class = models.CharField(max_length=100, default="Primary 1")
     programme = models.CharField(max_length=100, default="General Studies")
     
-    # Password tracking
+    # Password tracking & Permissions
     must_change_password = models.BooleanField(default=True)
     can_brand_portal = models.BooleanField(default=False)
 
@@ -61,7 +64,7 @@ class StudentResult(models.Model):
     academic_year = models.CharField(max_length=20, default="2026/2027")
 
     def save(self, *args, **kwargs):
-        self.total_score = self.class_score + self.exam_score
+        self.total_score = float(self.class_score) + float(self.exam_score)
         if self.total_score >= 80: self.grade = 'A'
         elif self.total_score >= 70: self.grade = 'B'
         elif self.total_score >= 60: self.grade = 'C'
@@ -88,3 +91,16 @@ class FeeLedgerEntry(models.Model):
 
     def __str__(self):
         return f"{self.student.user.get_full_name()} - Fees ({self.amount_paid})"
+
+
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.get_or_create(
+            user=instance,
+            defaults={
+                'role': 'admin' if instance.is_superuser else 'student',
+                'index_number': instance.username,
+                'must_change_password': False if instance.is_superuser else True
+            }
+        )
