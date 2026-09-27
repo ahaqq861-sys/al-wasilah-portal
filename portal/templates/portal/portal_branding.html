@@ -1,40 +1,54 @@
 {% extends 'portal/base.html' %}
 
-{% block title %}Portal Branding - {{ branding.school_name }}{% endblock %}
+{% block title %}School Branding - {{ branding.school_name }}{% endblock %}
 
 {% block content %}
-<h3 class="fw-bold text-secondary mb-4">Portal Branding Settings</h3>
+<h4 class="fw-bold text-secondary mb-3">Portal Customization & Branding</h4>
 
-<div class="card border-0 shadow-sm rounded-3 mx-auto" style="max-width: 600px;">
-    <div class="card-header text-white fw-bold py-3" style="background-color: var(--brand-wine);">
-        School & System Customization
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-header text-white fw-bold py-3" style="background-color: var(--brand-primary);">
+        <i class="fa-solid fa-palette me-2"></i> System Identity Settings
     </div>
     <div class="card-body p-4">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-success p-2 small">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-            <div class="mb-3">
-                <label class="form-label fw-bold small">School Name</label>
-                <input type="text" name="school_name" class="form-control" value="{{ branding.school_name }}">
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">School Name</label>
+                    <input type="text" name="school_name" class="form-control" value="{{ branding.school_name }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Motto</label>
+                    <input type="text" name="motto" class="form-control" value="{{ branding.motto }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Primary Interface Color (Hex)</label>
+                    <input type="color" name="primary_color" class="form-control form-control-color w-100" value="{{ branding.primary_color }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Accent Color (Hex)</label>
+                    <input type="color" name="accent_color" class="form-control form-control-color w-100" value="{{ branding.accent_color }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">School Logo Upload</label>
+                    <input type="file" name="logo" class="form-control" accept="image/*">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Contact Phone Number</label>
+                    <input type="text" name="contact_phone" class="form-control" value="{{ branding.contact_phone }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Academic Year</label>
+                    <input type="text" name="current_academic_year" class="form-control" value="{{ branding.current_academic_year }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Current Term / Trimester</label>
+                    <input type="text" name="current_term" class="form-control" value="{{ branding.current_term }}">
+                </div>
             </div>
-            <div class="mb-3">
-                <label class="form-label fw-bold small">Motto</label>
-                <input type="text" name="motto" class="form-control" value="{{ branding.motto }}">
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-bold small">Current Academic Year</label>
-                <input type="text" name="current_academic_year" class="form-control" value="{{ branding.current_academic_year }}">
-            </div>
-            <div class="mb-3">
-                <label class="form-label fw-bold small">Current Term</label>
-                <input type="text" name="current_term" class="form-control" value="{{ branding.current_term }}">
-            </div>
-            <button type="submit" class="btn text-white w-100 fw-bold py-2 mt-3" style="background-color: var(--brand-wine);">Update Settings</button>
+            <button type="submit" class="btn text-white fw-bold px-4 py-2 mt-2" style="background-color: var(--brand-primary);">
+                <i class="fa-solid fa-floppy-disk me-2"></i> Save Changes
+            </button>
         </form>
     </div>
 </div>

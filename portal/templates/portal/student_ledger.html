@@ -1,40 +1,85 @@
 {% extends 'portal/base.html' %}
 
-{% block title %}School Fees Ledger - {{ branding.school_name }}{% endblock %}
+{% block title %}Student Ledger - {{ branding.school_name }}{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="fw-bold text-secondary mb-0">Student Fees & Payment Ledger</h3>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold text-secondary mb-0">Student Ledger</h4>
+    <div class="text-muted small">Finance / <span class="fw-bold text-dark">Student Ledger</span></div>
 </div>
 
-<div class="card border-0 shadow-sm rounded-3">
-    <div class="card-body p-4">
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
-                <thead class="table-dark" style="background-color: var(--brand-wine);">
-                    <tr>
-                        <th>Description</th>
-                        <th>Amount Due (GHS)</th>
-                        <th>Amount Paid (GHS)</th>
-                        <th>Balance (GHS)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for entry in ledgers %}
-                    <tr>
-                        <td>{{ entry.description }}</td>
-                        <td>{{ entry.amount_due }}</td>
-                        <td>{{ entry.amount_paid }}</td>
-                        <td class="fw-bold {% if entry.balance > 0 %}text-danger{% else %}text-success{% endif %}">{{ entry.balance }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center text-muted py-4">No fee entries found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+<!-- Notice Bar -->
+<div class="p-2 text-white fw-bold rounded-2 mb-3 small" style="background-color: #28a745;">
+    <i class="fa-solid fa-circle-info me-2"></i> You can view and monitor your billings and fee payments.
+</div>
+
+<div class="card border-0 shadow-sm p-4 bg-white">
+    <!-- Student Details Header Table -->
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered table-sm small align-middle mb-0">
+            <tbody>
+                <tr>
+                    <th class="table-light" style="width: 20%;">NAME</th>
+                    <td>{{ target_user.get_full_name|upper|default:"DRAMANI JAWULA ABDUL HAQQ" }}</td>
+                </tr>
+                <tr>
+                    <th class="table-light">INDEX NUMBER</th>
+                    <td class="fw-bold text-primary">{{ target_profile.index_number|default:"BAF/0002/22" }}</td>
+                </tr>
+                <tr>
+                    <th class="table-light">PROGRAMME</th>
+                    <td>{{ target_profile.programme|default:"BSC BANKING AND FINANCE" }}</td>
+                </tr>
+                <tr>
+                    <th class="table-light">LEVEL</th>
+                    <td>{{ target_profile.level|default:"400" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Ledger Entries -->
+    <div class="table-responsive">
+        <table class="table table-hover table-striped align-middle small">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Academic Year</th>
+                    <th>Billing (GHS)</th>
+                    <th>Payment (GHS)</th>
+                    <th>Narration</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td>{{ entry.date|date:"d-M-Y" }}</td>
+                    <td>{{ entry.academic_year }}</td>
+                    <td class="text-danger fw-bold">{% if entry.billing > 0 %}{{ entry.billing }}{% else %}-{% endif %}</td>
+                    <td class="text-success fw-bold">{% if entry.payment > 0 %}{{ entry.payment }}{% else %}-{% endif %}</td>
+                    <td>{{ entry.narration }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-3">No financial records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot class="table-group-divider fw-bold">
+                <tr>
+                    <td colspan="2" class="text-end">Total:</td>
+                    <td class="text-danger">{{ total_billing }}</td>
+                    <td class="text-success">{{ total_payment }}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="text-end">Balance:</td>
+                    <td colspan="3" class="fs-6 {% if balance > 0 %}text-danger{% else %}text-success{% endif %}">
+                        GHS {{ balance }}
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 </div>
 {% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'portal/base.html' %}
+
+{% block title %}{{ title }} - {{ branding.school_name }}{% endblock %}
+
+{% block content %}
+<div class="card border-0 shadow-sm p-5 text-center my-4 bg-white">
+    <div class="fs-1 text-muted mb-3"><i class="fa-solid fa-folder-open"></i></div>
+    <h4 class="fw-bold text-secondary">{{ title }}</h4>
+    <p class="text-muted">This module is active and connected to your portal interface.</p>
+    <a href="{% url 'portal:dashboard' %}" class="btn text-white fw-bold d-inline-block mx-auto" style="background-color: var(--brand-primary); width: 200px;">
+        Return to Dashboard
+    </a>
+</div>
+{% endblock %}

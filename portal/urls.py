@@ -10,4 +10,5 @@ urlpatterns = [
     path('register-users/', views.register_users, name='register_users'),
     path('batch-excel-upload/', views.batch_excel_upload, name='batch_excel_upload'),
     path('portal-branding/', views.portal_branding, name='portal_branding'),
+    path('section/<str:title>/', views.placeholder_view, name='placeholder'),
 ]

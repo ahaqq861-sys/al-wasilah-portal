@@ -8,11 +8,12 @@
     <link href="https://cdnjs.cloudflare.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --sidebar-width: 250px;
-            --brand-wine: #5c1825;
-            --brand-wine-dark: #430f19;
-            --brand-gold: #e6b800;
-            --bg-light: #f4f6f9;
+            --sidebar-width: 260px;
+            --brand-primary: {{ branding.primary_color|default:"#5c1825" }};
+            --brand-accent: {{ branding.accent_color|default:"#e6b800" }};
+            --sidebar-bg: #2d3139;
+            --sidebar-header: #24272e;
+            --bg-light: #edf1f5;
         }
 
         body {
@@ -20,6 +21,7 @@
             background-color: var(--bg-light);
             margin: 0;
             overflow-x: hidden;
+            font-size: 0.9rem;
         }
 
         .sidebar {
@@ -28,54 +30,70 @@
             position: fixed;
             top: 0;
             left: 0;
-            background-color: var(--brand-wine-dark);
+            background-color: var(--sidebar-bg);
             color: #ffffff;
             z-index: 100;
             display: flex;
             flex-direction: column;
         }
 
-        .sidebar-header {
-            background-color: var(--brand-wine);
-            padding: 15px 20px;
-            font-weight: bold;
-            font-size: 1.1rem;
+        .sidebar-brand {
+            background-color: var(--brand-primary);
+            padding: 12px 18px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.05rem;
             color: #ffffff;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
         }
 
-        .sidebar-header i { color: var(--brand-gold); }
+        .sidebar-brand img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            border-radius: 4px;
+        }
 
-        .user-profile-section {
-            padding: 20px 15px;
-            text-align: center;
-            background-color: var(--brand-wine-dark);
+        .user-profile-widget {
+            padding: 15px 12px;
+            background-color: #24272e;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .user-avatar-icon {
-            font-size: 2.5rem;
-            color: var(--brand-gold);
-            margin-bottom: 5px;
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--brand-accent);
         }
 
-        .user-name {
-            font-weight: bold;
-            color: var(--brand-gold);
-            font-size: 1rem;
-            margin-bottom: 4px;
+        .user-info-text {
+            overflow: hidden;
         }
 
-        .user-badge {
-            background-color: var(--brand-gold);
-            color: #000000;
-            font-size: 0.68rem;
+        .user-info-name {
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 0.82rem;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        .user-role-badge {
+            font-size: 0.65rem;
+            background-color: var(--brand-accent);
+            color: #000;
             font-weight: 800;
-            padding: 3px 10px;
-            border-radius: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
             display: inline-block;
             text-transform: uppercase;
         }
@@ -83,160 +101,187 @@
         .sidebar-menu {
             list-style: none;
             padding: 0;
-            margin: 10px 0 0 0;
+            margin: 0;
             flex-grow: 1;
             overflow-y: auto;
+        }
+
+        .menu-category-title {
+            padding: 12px 18px 4px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: #8a94a6;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
 
         .sidebar-menu li a {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            color: #d1d5db;
+            justify-content: space-between;
+            padding: 10px 18px;
+            color: #b0b7c3;
             text-decoration: none;
+            font-size: 0.85rem;
             font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
         }
 
-        .sidebar-menu li a:hover, .sidebar-menu li.active a {
-            background-color: rgba(255, 255, 255, 0.08);
-            color: var(--brand-gold);
+        .sidebar-menu li a:hover, .sidebar-menu li.active > a {
+            background-color: rgba(255,255,255,0.08);
+            color: #ffffff;
         }
 
-        .sidebar-menu li a i { width: 20px; }
+        .sidebar-menu li.active > a {
+            border-left: 4px solid var(--brand-primary);
+            background-color: var(--brand-primary);
+            color: #ffffff;
+        }
+
+        .menu-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
         .top-navbar {
             margin-left: var(--sidebar-width);
-            height: 60px;
-            background-color: var(--brand-wine);
+            height: 52px;
+            background-color: var(--brand-primary);
             color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 25px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .top-navbar-title {
+            font-size: 1rem;
             font-weight: 700;
-            font-size: 1.2rem;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .top-navbar-date {
-            font-size: 0.85rem;
-            opacity: 0.9;
-        }
-
         .main-content {
             margin-left: var(--sidebar-width);
-            padding: 25px;
-            min-height: calc(100vh - 60px);
+            padding: 20px;
+            min-height: calc(100vh - 52px - 40px);
         }
 
-        .metric-card {
-            border: none;
-            border-radius: 8px;
-            padding: 18px 20px;
-            color: #ffffff;
-            position: relative;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        .footer-bar {
+            margin-left: var(--sidebar-width);
+            background-color: #ffffff;
+            border-top: 1px solid #dee2e6;
+            padding: 10px 20px;
+            font-size: 0.78rem;
+            color: #6c757d;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .metric-card-wine { background-color: var(--brand-wine); }
-        .metric-card-white { background-color: #ffffff; color: #333333; border-left: 4px solid var(--brand-gold); }
-        .metric-card-green { background-color: #ffffff; color: #333333; border-left: 4px solid #198754; }
-
-        .metric-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: rgba(255,255,255,0.75);
-            margin-bottom: 5px;
+        .sub-menu {
+            list-style: none;
+            padding-left: 0;
+            background-color: #21242b;
         }
 
-        .metric-card-white .metric-label, .metric-card-green .metric-label { color: #6c757d; }
-        .metric-value { font-size: 1.4rem; font-weight: 800; }
-        .metric-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 2rem; opacity: 0.8; }
-
-        .term-badge {
-            background-color: var(--brand-wine);
-            color: #ffffff;
-            font-weight: 700;
-            padding: 6px 16px;
-            border-radius: 6px;
-            font-size: 0.88rem;
+        .sub-menu li a {
+            padding-left: 48px !important;
+            font-size: 0.8rem !important;
         }
-
-        /* Calendar Styling */
-        .calendar-table { width: 100%; text-align: center; border-collapse: collapse; }
-        .calendar-table th { font-size: 0.75rem; color: #6c757d; text-transform: uppercase; padding: 6px 0; }
-        .calendar-table td { padding: 8px 0; font-size: 0.85rem; font-weight: 600; }
-        .calendar-table td.today { background-color: var(--brand-wine); color: #fff; border-radius: 50%; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="sidebar-header">
-            <i class="fa-solid fa-graduation-cap"></i>
-            <span>{{ branding.school_name|default:"Al-Wasilah Portal" }}</span>
+        <div class="sidebar-brand">
+            {% if branding.logo %}
+                <img src="{{ branding.logo.url }}" alt="Logo">
+            {% else %}
+                <i class="fa-solid fa-graduation-cap text-warning fs-4"></i>
+            {% endif %}
+            <span>UCM Enterprise</span>
         </div>
 
-        <div class="user-profile-section">
-            <div class="user-avatar-icon">
-                <i class="fa-solid fa-user-gear"></i>
+        <div class="user-profile-widget">
+            {% if user_profile.profile_picture %}
+                <img src="{{ user_profile.profile_picture.url }}" class="user-avatar" alt="User">
+            {% else %}
+                <div class="user-avatar d-flex align-items-center justify-content-center bg-secondary text-white fw-bold">
+                    {{ request.user.username|slice:":1"|upper }}
+                </div>
+            {% endif %}
+            <div class="user-info-text">
+                <div class="user-info-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                <span class="user-role-badge">{{ user_profile.role|default:"STUDENT" }}</span>
             </div>
-            <div class="user-name">{{ request.user.username|default:"admin" }}</div>
-            <span class="user-badge">BASIC SCHOOL</span>
         </div>
 
         <ul class="sidebar-menu">
-            <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <li>
                 <a href="{% url 'portal:dashboard' %}">
-                    <i class="fa-solid fa-house"></i>
-                    <span>Dashboard</span>
+                    <div class="menu-left"><i class="fa-solid fa-house me-2"></i> Dashboard</div>
                 </a>
             </li>
-            <li class="{% if request.resolver_match.url_name == 'terminal_results' %}active{% endif %}">
-                <a href="{% url 'portal:terminal_results' %}">
-                    <i class="fa-regular fa-file-lines"></i>
-                    <span>Terminal Report</span>
+
+            <!-- ACADEMICS SECTION -->
+            <li>
+                <a data-bs-toggle="collapse" href="#academicsMenu" role="button" aria-expanded="false">
+                    <div class="menu-left"><i class="fa-solid fa-graduation-cap me-2"></i> Academics</div>
+                    <i class="fa-solid fa-chevron-down fs-7"></i>
                 </a>
+                <div class="collapse" id="academicsMenu">
+                    <ul class="sub-menu">
+                        <li><a href="{% url 'portal:terminal_results' %}"><i class="fa-regular fa-file-lines me-2"></i> My Results</a></li>
+                        <li><a href="{% url 'portal:placeholder' 'Registration' %}"><i class="fa-solid fa-pen-to-square me-2"></i> Registration</a></li>
+                        <li><a href="{% url 'portal:placeholder' 'My Courses' %}"><i class="fa-solid fa-book me-2"></i> My Courses</a></li>
+                        <li><a href="{% url 'portal:placeholder' 'My Schedule' %}"><i class="fa-solid fa-calendar-days me-2"></i> My Schedule</a></li>
+                    </ul>
+                </div>
             </li>
-            <li class="{% if request.resolver_match.url_name == 'student_ledger' %}active{% endif %}">
-                <a href="{% url 'portal:student_ledger' %}">
-                    <i class="fa-solid fa-receipt"></i>
-                    <span>School Fees Ledger</span>
+
+            <!-- FINANCE SECTION -->
+            <li>
+                <a data-bs-toggle="collapse" href="#financeMenu" role="button" aria-expanded="false">
+                    <div class="menu-left"><i class="fa-solid fa-scale-balanced me-2"></i> Finance</div>
+                    <i class="fa-solid fa-chevron-down fs-7"></i>
                 </a>
+                <div class="collapse" id="financeMenu">
+                    <ul class="sub-menu">
+                        <li><a href="{% url 'portal:student_ledger' %}"><i class="fa-solid fa-receipt me-2"></i> Student Ledger</a></li>
+                        <li><a href="{% url 'portal:placeholder' 'Payment Options' %}"><i class="fa-solid fa-credit-card me-2"></i> Make Payment</a></li>
+                    </ul>
+                </div>
             </li>
-            <li class="{% if request.resolver_match.url_name == 'register_users' %}active{% endif %}">
+
+            <!-- ADMIN / TEACHER MANAGEMENT CONTROLS -->
+            {% if user_profile.role == 'admin' or user_profile.role == 'teacher' %}
+            <div class="menu-category-title">Administration</div>
+            <li>
                 <a href="{% url 'portal:register_users' %}">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <span>Register Users</span>
-                </a>
-            </li>
-            <li class="{% if request.resolver_match.url_name == 'batch_excel_upload' %}active{% endif %}">
-                <a href="{% url 'portal:batch_excel_upload' %}">
-                    <i class="fa-solid fa-file-excel"></i>
-                    <span>Batch Excel Upload</span>
-                </a>
-            </li>
-            <li class="{% if request.resolver_match.url_name == 'portal_branding' %}active{% endif %}">
-                <a href="{% url 'portal:portal_branding' %}">
-                    <i class="fa-solid fa-sliders"></i>
-                    <span>Portal Branding</span>
+                    <div class="menu-left"><i class="fa-solid fa-user-plus me-2"></i> Register Users</div>
                 </a>
             </li>
             <li>
+                <a href="{% url 'portal:batch_excel_upload' %}">
+                    <div class="menu-left"><i class="fa-solid fa-file-excel me-2"></i> Batch Excel Upload</div>
+                </a>
+            </li>
+            {% endif %}
+
+            {% if user_profile.role == 'admin' %}
+            <li>
+                <a href="{% url 'portal:portal_branding' %}">
+                    <div class="menu-left"><i class="fa-solid fa-sliders me-2"></i> School Branding</div>
+                </a>
+            </li>
+            {% endif %}
+
+            <li class="mt-4">
                 <a href="{% url 'logout' %}" class="text-danger">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    <span>Logout</span>
+                    <div class="menu-left"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</div>
                 </a>
             </li>
         </ul>
@@ -244,17 +289,31 @@
 
     <div class="top-navbar">
         <div class="top-navbar-title">
-            <i class="fa-solid fa-school"></i>
-            <span>{{ branding.school_name|default:"Al-Wasilah Basic School Portal" }}</span>
+            <i class="fa-solid fa-bars me-2"></i>
+            <span>{{ branding.school_name }}</span>
         </div>
-        <div class="top-navbar-date">
-            <i class="fa-regular fa-calendar-days me-1"></i>
-            <span>{{ today_day_name }}, {{ today_date_str }}</span>
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-light text-dark fw-bold px-3 py-2">{{ branding.current_academic_year }}</span>
+            <i class="fa-regular fa-bell fs-5 cursor-pointer"></i>
         </div>
     </div>
 
     <div class="main-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show mb-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
         {% block content %}{% endblock %}
+    </div>
+
+    <div class="footer-bar">
+        <span>Copyright © 2026 <strong style="color: var(--brand-primary);">{{ branding.school_name }}</strong>. All rights reserved.</span>
+        <span>Version 5.3.0</span>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
