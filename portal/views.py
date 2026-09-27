@@ -31,7 +31,6 @@ def login_view(request):
         if user is not None:
             login(request, user)
             
-            # Safe Profile Lookup / Auto-creation to prevent RelatedObjectDoesNotExist
             profile, created = UserProfile.objects.get_or_create(
                 user=user,
                 defaults={
@@ -283,3 +282,9 @@ def branding_view(request):
         return redirect('portal:branding')
 
     return render(request, 'portal/branding.html', {'branding': branding, 'profile': profile})
+
+
+@login_required
+def placeholder_view(request, feature_name="Feature"):
+    messages.info(request, f"The '{feature_name}' feature is currently under development.")
+    return redirect('portal:dashboard')

@@ -1,98 +1,76 @@
 {% extends 'portal/base.html' %}
 
 {% block title %}Dashboard - {{ branding.school_name }}{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="fw-bold text-secondary mb-0">Dashboard</h4>
-    <div class="text-muted small">Home / <span class="fw-bold text-dark">Dashboard</span></div>
-</div>
-
-<!-- Metric Header Widgets -->
-<div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3">
-            <div class="p-3 rounded text-white fs-3" style="background-color: var(--brand-primary);">
-                <i class="fa-solid fa-user-graduate"></i>
-            </div>
-            <div>
-                <div class="text-muted small text-uppercase fw-bold">Active Courses</div>
-                <div class="fs-4 fw-bold">6</div>
+<div class="row g-4 mb-4">
+    <!-- Admin Metrics -->
+    {% if profile.role == 'admin' %}
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-3 p-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary text-white rounded-circle p-3 me-3">
+                    <i class="fa-solid fa-user-graduate fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Total Students</h6>
+                    <h3 class="fw-bold mb-0">{{ total_students }}</h3>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3">
-            <div class="p-3 rounded bg-success text-white fs-3">
-                <i class="fa-solid fa-clipboard-check"></i>
-            </div>
-            <div>
-                <div class="text-muted small text-uppercase fw-bold">Attendance Rate</div>
-                <div class="fs-4 fw-bold">98%</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3">
-            <div class="p-3 rounded bg-warning text-dark fs-3">
-                <i class="fa-solid fa-calendar-check"></i>
-            </div>
-            <div>
-                <div class="text-muted small text-uppercase fw-bold">Current Term</div>
-                <div class="fs-6 fw-bold">{{ branding.current_term }}</div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-3 p-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-success text-white rounded-circle p-3 me-3">
+                    <i class="fa-solid fa-chalkboard-user fa-2x"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Total Teachers</h6>
+                    <h3 class="fw-bold mb-0">{{ total_teachers }}</h3>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center gap-3">
-            <div class="p-3 rounded bg-info text-white fs-3">
-                <i class="fa-solid fa-wallet"></i>
-            </div>
-            <div>
-                <div class="text-muted small text-uppercase fw-bold">Fee Status</div>
-                <div class="fs-6 fw-bold text-success">CLEARED</div>
-            </div>
-        </div>
-    </div>
+    {% endif %}
 </div>
 
 <div class="row g-4">
-    <!-- Schedule & Lecture Card -->
+    <!-- Main Info Section -->
     <div class="col-lg-8">
-        <div class="card border-0 shadow-sm rounded-3">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h6 class="fw-bold mb-0 text-secondary">Lecture Schedule - {{ today_day_name }} {{ today_date_str }}</h6>
-                <button class="btn btn-sm btn-outline-secondary"><i class="fa-solid fa-rotate-right me-1"></i> Refresh</button>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Programme</th>
-                                <th>Course</th>
-                                <th>Period</th>
-                                <th>Venue</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
+        <div class="card border-0 shadow-sm rounded-3 p-4 mb-4">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-address-card me-2 text-primary"></i>Profile Details</h5>
+            <div class="row">
+                <div class="col-md-4 text-center mb-3">
+                    {% if profile.passport_picture %}
+                        <img src="{{ profile.passport_picture.url }}" alt="Passport" class="img-thumbnail rounded-circle mb-2" style="width: 140px; height: 140px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2" style="width: 140px; height: 140px;">
+                            <i class="fa-solid fa-user fa-4x text-secondary"></i>
+                        </div>
+                    {% endif %}
+                    <h6 class="fw-bold mb-0">{{ request.user.get_full_name|default:request.user.username }}</h6>
+                    <span class="badge bg-secondary text-uppercase">{{ profile.role }}</span>
+                </div>
+                <div class="col-md-8">
+                    <table class="table table-borderless table-sm">
                         <tbody>
                             <tr>
-                                <td>1</td>
-                                <td>{{ user_profile.programme|default:"BSC BANKING AND FINANCE" }}</td>
-                                <td>FINANCIAL ACCOUNTING</td>
-                                <td>08:00 - 10:00</td>
-                                <td>LH 1</td>
-                                <td><span class="badge bg-success">Ongoing</span></td>
+                                <th class="text-muted" style="width: 35%;">Index / ID:</th>
+                                <td class="fw-bold">{{ profile.index_number|default:"N/A" }}</td>
                             </tr>
                             <tr>
-                                <td>2</td>
-                                <td>{{ user_profile.programme|default:"BSC BANKING AND FINANCE" }}</td>
-                                <td>BUSINESS MATHEMATICS</td>
-                                <td>10:30 - 12:30</td>
-                                <td>LH 4</td>
-                                <td><span class="badge bg-secondary">Upcoming</span></td>
+                                <th class="text-muted">Assigned Class:</th>
+                                <td>{{ profile.assigned_class }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Programme:</th>
+                                <td>{{ profile.programme }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-muted">Gender:</th>
+                                <td>{{ profile.gender|default:"Not specified" }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -101,42 +79,14 @@
         </div>
     </div>
 
-    <!-- Right Side Schedule Badge & Calendar -->
+    <!-- Right Side Schedule Badge -->
     <div class="col-lg-4">
-        <div class="card text-white text-center p-4 mb-3 border-0 shadow-sm rounded-3" style="background-color: var(--brand-primary);">
-            <h6 class="fw-bold text-uppercase mb-1" style="color: var(--brand-accent);">Current Schedule</h6>
-            <h5 class="fw-bold">{{ branding.current_academic_year }}</h5>
-            <div class="fw-bold mb-3">{{ branding.current_term }}</div>
-            <h3 class="fw-bold text-uppercase">{{ today_day_name }}</h3>
-            <div>{{ today_date_str }}</div>
-            <a href="{% url 'portal:placeholder' 'Timetable' %}" class="btn btn-info btn-sm mt-3 text-white fw-bold px-4"><i class="fa-solid fa-eye me-1"></i> View Timetable</a>
-        </div>
-
-        <!-- Dynamic Calendar Widget -->
-        <div class="card border-0 shadow-sm rounded-3">
-            <div class="card-header text-white py-2 fw-bold d-flex justify-content-between align-items-center" style="background-color: #17a2b8;">
-                <span><i class="fa-solid fa-calendar-days me-2"></i>{{ month_name }} {{ current_year }}</span>
-            </div>
-            <div class="card-body p-2">
-                <table class="w-100 text-center small">
-                    <thead>
-                        <tr class="text-muted">
-                            <th>Su</th><th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for week in month_days %}
-                        <tr>
-                            {% for day in week %}
-                                <td class="py-2 {% if day == today_day %}bg-info text-white rounded-circle fw-bold{% endif %}">
-                                    {% if day != 0 %}{{ day }}{% endif %}
-                                </td>
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="card text-white text-center p-4 mb-3 border-0 shadow-sm rounded-3" style="background-color: var(--brand-primary, #0d6efd);">
+            <h6 class="fw-bold text-uppercase mb-1" style="color: var(--brand-accent, #ffc107);">Academic Period</h6>
+            <h5 class="fw-bold">{{ branding.school_name }}</h5>
+            <a href="{% url 'portal:placeholder' 'Timetable' %}" class="btn btn-info btn-sm mt-3 text-white fw-bold px-4">
+                <i class="fa-solid fa-eye me-1"></i> View Timetable
+            </a>
         </div>
     </div>
 </div>
