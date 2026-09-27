@@ -3,93 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ branding.school_name }} - Portal</title>
+    <title>{% block title %}{{ branding.school_name }}{% endblock %}</title>
+    <!-- Bootstrap 5 CSS & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --brand-primary: #581825;
-            --brand-secondary: #7a2334;
-            --brand-light: #f8f9fa;
+            --brand-primary: #800020; /* Deep Burgundy / Wine */
+            --brand-dark: #4a0012;
+            --brand-light: #f8f1f3;
+            --brand-accent: #ffc107;
+            --sidebar-bg: #1e2229;
+            --sidebar-hover: #2a2f38;
         }
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .sidebar { min-height: 100vh; background-color: var(--brand-primary); color: white; }
-        .sidebar a { color: rgba(255,255,255,0.8); text-decoration: none; padding: 12px 20px; display: block; font-weight: 500; }
-        .sidebar a:hover, .sidebar a.active { background-color: var(--brand-secondary); color: white; border-left: 4px solid #fff; }
-        .topbar { background: white; border-bottom: 1px solid #e3e6f0; padding: 15px 30px; }
-        .btn-primary-brand { background-color: var(--brand-primary); color: white; border: none; }
-        .btn-primary-brand:hover { background-color: var(--brand-secondary); color: white; }
-        @media print {
-            .no-print { display: none !important; }
-            .sidebar { display: none !important; }
-            .main-content { margin-left: 0 !important; width: 100% !important; }
+
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.9rem;
+        }
+
+        /* Sidebar Styling */
+        #sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background-color: var(--sidebar-bg);
+            color: #abb2bf;
+            transition: all 0.3s;
+        }
+
+        #sidebar .sidebar-header {
+            background-color: var(--brand-primary);
+            color: #fff;
+            padding: 15px;
+        }
+
+        #sidebar ul.components {
+            padding: 10px 0;
+        }
+
+        #sidebar ul li a {
+            padding: 12px 20px;
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            color: #abb2bf;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        #sidebar ul li a:hover, #sidebar ul li.active > a {
+            color: #fff;
+            background-color: var(--sidebar-hover);
+            border-left: 4px solid var(--brand-primary);
+        }
+
+        #sidebar ul li a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            background-color: var(--brand-primary) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* UDS Portal Style Cards & Tables */
+        .portal-card {
+            background: #fff;
+            border-radius: 4px;
+            border: 1px solid #e1e6eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .portal-header-banner {
+            border-bottom: 2px solid var(--brand-primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .table-uds {
+            font-size: 0.85rem;
+        }
+
+        .table-uds th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .nav-tabs-portal .nav-link {
+            color: #495057;
+            font-weight: 600;
+            border: none;
+            border-bottom: 3px solid transparent;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .nav-tabs-portal .nav-link.active {
+            color: var(--brand-primary);
+            border-bottom: 3px solid var(--brand-primary);
+            background: transparent;
+        }
+
+        .btn-brand {
+            background-color: var(--brand-primary);
+            color: #fff;
+        }
+
+        .btn-brand:hover {
+            background-color: var(--brand-dark);
+            color: #fff;
         }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 p-0 sidebar no-print">
-            <div class="p-3 text-center border-bottom border-secondary">
-                {% if branding.logo %}
-                    <img src="{{ branding.logo.url }}" height="50" alt="Logo" class="mb-2 rounded">
-                {% else %}
-                    <i class="fas fa-graduation-cap fa-2x mb-2"></i>
-                {% endif %}
-                <h6 class="m-0 fw-bold">{{ branding.school_name }}</h6>
+
+<div class="d-flex">
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar">
+        <div class="sidebar-header d-flex align-items-center">
+            {% if branding.logo %}
+                <img src="{{ branding.logo.url }}" alt="Logo" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
+            {% else %}
+                <i class="fa-solid fa-graduation-cap fa-2x me-2"></i>
+            {% endif %}
+            <div class="lh-1">
+                <h6 class="fw-bold mb-0 text-truncate" style="max-width: 170px;">{{ branding.school_name }}</h6>
+                <small class="text-warning" style="font-size: 0.7rem;">PORTAL v5.3.0</small>
             </div>
-            <div class="mt-3">
-                <a href="{% url 'portal:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                </a>
-                <a href="{% url 'portal:results' %}" class="{% if request.resolver_match.url_name == 'results' %}active{% endif %}">
-                    <i class="fas fa-file-invoice me-2"></i> Academic Results
-                </a>
-                {% if profile.role != 'student' %}
-                <a href="{% url 'portal:registration' %}" class="{% if request.resolver_match.url_name == 'registration' %}active{% endif %}">
-                    <i class="fas fa-user-plus me-2"></i> User Registration
-                </a>
-                {% endif %}
-                <a href="{% url 'portal:fees' %}" class="{% if request.resolver_match.url_name == 'fees' %}active{% endif %}">
-                    <i class="fas fa-wallet me-2"></i> School Fees
-                </a>
-                {% if profile.role == 'admin' or profile.can_brand_portal %}
-                <a href="{% url 'portal:branding' %}" class="{% if request.resolver_match.url_name == 'branding' %}active{% endif %}">
-                    <i class="fas fa-paint-brush me-2"></i> Portal Branding
-                </a>
-                {% endif %}
-                <a href="{% url 'portal:logout' %}" class="text-danger mt-4">
-                    <i class="fas fa-sign-out-alt me-2"></i> Logout
-                </a>
+        </div>
+
+        <div class="p-3 border-bottom border-secondary d-flex align-items-center">
+            {% if profile.passport_picture %}
+                <img src="{{ profile.passport_picture.url }}" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
+            {% else %}
+                <i class="fa-solid fa-circle-user fa-2x me-2 text-secondary"></i>
+            {% endif %}
+            <div class="lh-1 text-truncate">
+                <span class="d-block text-white fw-bold small text-truncate">{{ request.user.get_full_name|default:request.user.username }}</span>
+                <small class="text-muted text-uppercase" style="font-size: 0.65rem;">{{ profile.role }}</small>
+            </div>
+        </div>
+
+        <ul class="list-unstyled components">
+            <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <a href="{% url 'portal:dashboard' %}"><i class="fa-solid fa-house"></i> Home / Dashboard</a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'results' %}active{% endif %}">
+                <a href="{% url 'portal:results' %}"><i class="fa-solid fa-square-poll-vertical"></i> Academics / Results</a>
+            </li>
+            <li class="{% if request.resolver_match.url_name == 'fees' %}active{% endif %}">
+                <a href="{% url 'portal:fees' %}"><i class="fa-solid fa-wallet"></i> Finance / Student Ledger</a>
+            </li>
+            
+            {% if profile.role == 'admin' or profile.role == 'teacher' %}
+            <li class="{% if request.resolver_match.url_name == 'registration' %}active{% endif %}">
+                <a href="{% url 'portal:registration' %}"><i class="fa-solid fa-user-plus"></i> User Registration</a>
+            </li>
+            {% endif %}
+
+            {% if profile.role == 'admin' or profile.can_brand_portal %}
+            <li class="{% if request.resolver_match.url_name == 'branding' %}active{% endif %}">
+                <a href="{% url 'portal:branding' %}"><i class="fa-solid fa-palette"></i> Portal Branding</a>
+            </li>
+            {% endif %}
+
+            <li class="mt-4">
+                <a href="{% url 'portal:logout' %}" class="text-danger"><i class="fa-solid fa-right-from-bracket text-danger"></i> Logout</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Page Content Area -->
+    <div class="w-100">
+        <!-- Top Green/Wine Header Bar -->
+        <nav class="navbar navbar-expand-lg top-navbar navbar-dark px-3">
+            <button type="button" id="sidebarCollapse" class="btn btn-link text-white me-3 p-0">
+                <i class="fa-solid fa-bars fa-lg"></i>
+            </button>
+            <span class="navbar-brand mb-0 h1 fs-6 fw-bold text-white"><i class="fa-solid fa-house me-2"></i>Home</span>
+
+            <div class="ms-auto d-flex align-items-center text-white">
+                <a href="#" class="text-white me-3"><i class="fa-solid fa-magnifying-glass"></i></a>
+                <a href="#" class="text-white me-3"><i class="fa-solid fa-user"></i></a>
+                <a href="#" class="text-white me-3"><i class="fa-solid fa-arrows-rotate"></i></a>
+                <a href="#" class="text-white"><i class="fa-solid fa-border-all"></i></a>
             </div>
         </nav>
 
-        <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 p-0 main-content">
-            <div class="topbar d-flex justify-content-between align-items-center no-print">
-                <h5 class="m-0 fw-bold text-dark">{% block page_title %}Dashboard{% endblock %}</h5>
-                <div>
-                    <span class="badge bg-secondary p-2 me-2">{{ profile.role|upper }}</span>
-                    <strong>{{ request.user.get_full_name|default:request.user.username }}</strong>
-                </div>
-            </div>
+        <!-- Dynamic Content Body -->
+        <div class="container-fluid p-4">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show small py-2" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
 
-            <div class="p-4">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
-                {% block content %}{% endblock %}
-            </div>
-        </main>
+            {% block content %}{% endblock %}
+        </div>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
