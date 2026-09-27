@@ -1,7 +1,7 @@
 import calendar
 from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -9,8 +9,26 @@ from django.db.models import Sum
 from .models import PortalBranding, UserProfile, StatementOfResult, FeeLedgerEntry
 
 def login_view(request):
+    # Redirect if user is already logged in
     if request.user.is_authenticated:
         return redirect('portal:dashboard')
+
+    if request.method == 'POST':
+        # Accept username or index_number
+        username_input = request.POST.get('username') or request.POST.get('index_number')
+        password_input = request.POST.get('password')
+
+        user = authenticate(request, username=username_input, password=password_input)
+
+        if user is not None:
+            login(request, user)
+            next_url = request.GET.get('next') or request.POST.get('next')
+            if next_url:
+                return redirect(next_url)
+            return redirect('portal:dashboard')
+        else:
+            messages.error(request, "Invalid username/ID or password. Please try again.")
+
     return render(request, 'portal/login.html')
 
 def logout_view(request):
