@@ -5,9 +5,8 @@ def create_superuser(apps, schema_editor):
     User = apps.get_model('auth', 'User')
     UserProfile = apps.get_model('portal', 'UserProfile')
 
-    # Define your live admin credentials here
     USERNAME = 'admin'
-    PASSWORD = 'hananatubaA1'  # Change this to your preferred password
+    PASSWORD = 'hananatubaA1'  # Ensure this is the password you want
     EMAIL = 'ahaqq861@gmail.com'
 
     if not User.objects.filter(username=USERNAME).exists():
@@ -22,16 +21,12 @@ def create_superuser(apps, schema_editor):
             last_name='Admin'
         )
 
-        # Create corresponding admin profile if UserProfile model exists
-        UserProfile.objects.get_or_create(
-            user=admin_user,
-            defaults={
-                'role': 'admin',
-                'index_number': 'ADMIN001',
-                'programme': 'ADMINISTRATION',
-                'assigned_class': 'N/A'
-            }
-        )
+        # Create basic UserProfile without conflicting extra fields
+        if not UserProfile.objects.filter(user=admin_user).exists():
+            UserProfile.objects.create(
+                user=admin_user,
+                role='admin'
+            )
 
 def remove_superuser(apps, schema_editor):
     User = apps.get_model('auth', 'User')
@@ -40,7 +35,7 @@ def remove_superuser(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('portal', '0001_initial'),  # Make sure this matches your previous migration name
+        ('portal', '0001_initial'),
     ]
 
     operations = [
