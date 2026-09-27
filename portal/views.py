@@ -1,6 +1,7 @@
 import calendar
 from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -11,6 +12,11 @@ def login_view(request):
     if request.user.is_authenticated:
         return redirect('portal:dashboard')
     return render(request, 'portal/login.html')
+
+def logout_view(request):
+    logout(request)
+    messages.info(request, "You have been logged out successfully.")
+    return redirect('login')
 
 @login_required
 def dashboard_view(request):
@@ -199,7 +205,6 @@ def portal_branding(request):
 
     return render(request, 'portal/portal_branding.html', {'branding': branding})
 
-# Stub Views to prevent broken routes/404 errors on any clicked link
 @login_required
 def placeholder_view(request, title="Section"):
     return render(request, 'portal/placeholder.html', {'title': title})
