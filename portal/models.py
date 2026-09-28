@@ -3,14 +3,15 @@ from django.contrib.auth.models import User
 
 class PortalBranding(models.Model):
     school_name = models.CharField(max_length=255, default="AL-WASILAH SCHOOL COMPLEX")
-    tagline_subtext = models.CharField(max_length=255, default="Excellence in Academic & Moral Training")
-    primary_color = models.CharField(max_length=10, default="#800020") # Wine/Burgundy
+    tagline_subtext = models.CharField(max_length=255, default="Knowledge, Integrity and Excellence")
+    primary_color = models.CharField(max_length=10, default="#800020") # Burgundy / Wine
     secondary_color = models.CharField(max_length=10, default="#17a2b8")
+    sidebar_color = models.CharField(max_length=10, default="#1e2229")
     logo = models.ImageField(upload_to="branding/", blank=True, null=True)
     contact_email = models.EmailField(default="info@alwasilah.edu.gh")
     contact_phone = models.CharField(max_length=20, default="+233 24 000 0000")
     address = models.TextField(default="Tamale, Northern Region, Ghana")
-    footer_text = models.CharField(max_length=255, default="Copyright © 2026 Al-Wasilah School Complex. All rights reserved.")
+    footer_copyright = models.CharField(max_length=255, default="Copyright © 2026 Al-Wasilah School Complex. All rights reserved.")
 
     def __str__(self):
         return self.school_name
@@ -31,10 +32,9 @@ class StudentProfile(models.Model):
     passport_picture = models.ImageField(upload_to="passports/", blank=True, null=True)
     can_brand_portal = models.BooleanField(default=False)
     
-    # Feature 1: Attendance Tracking & Remarks
     days_present = models.IntegerField(default=0)
     total_school_days = models.IntegerField(default=60)
-    teacher_remarks = models.TextField(default="Satisfactory progress made. Keep working hard.")
+    teacher_remarks = models.TextField(default="Satisfactory academic performance. Keep working hard.")
     conduct_rating = models.CharField(max_length=50, default="GOOD")
 
     def __str__(self):
@@ -89,7 +89,7 @@ class AcademicResult(models.Model):
 class Announcement(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
-    target_role = models.CharField(max_length=20, default='all') # all, student, teacher
+    target_role = models.CharField(max_length=20, default='all')
     date_posted = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

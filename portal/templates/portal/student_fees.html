@@ -1,98 +1,72 @@
 {% extends 'portal/base.html' %}
 
-{% block title %}Student Ledger - {{ branding.school_name }}{% endblock %}
+{% block title %}Fee Ledger - {{ branding.school_name }}{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="fw-bold mb-0">Student Ledger</h4>
-    <small class="text-muted">Finance / Student Ledger</small>
+    <h4 class="fw-bold mb-0">Financial Ledger Statement</h4>
+    <button onclick="window.print()" class="btn btn-secondary btn-sm"><i class="fa-solid fa-print me-1"></i> Print Statement</button>
 </div>
 
-<div class="alert alert-success border-0 text-white fw-bold py-2 px-3 mb-3" style="background-color: #28a745;">
-    <i class="fa-solid fa-circle-info me-2"></i>You can view and monitor your billings and fee payments
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="portal-card p-3 border-start border-4 border-primary">
+            <small class="text-muted fw-bold d-block">TOTAL CHARGED / DUE</small>
+            <h4 class="fw-bold mb-0 text-primary">GHS {{ total_due|floatformat:2 }}</h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="portal-card p-3 border-start border-4 border-success">
+            <small class="text-muted fw-bold d-block">TOTAL PAID</small>
+            <h4 class="fw-bold mb-0 text-success">GHS {{ total_paid|floatformat:2 }}</h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="portal-card p-3 border-start border-4 border-danger">
+            <small class="text-muted fw-bold d-block">OUTSTANDING BALANCE</small>
+            <h4 class="fw-bold mb-0 text-danger">GHS {{ balance_outstanding|floatformat:2 }}</h4>
+        </div>
+    </div>
 </div>
-
-<ul class="nav nav-tabs nav-tabs-portal mb-3">
-    <li class="nav-item">
-        <a class="nav-link active" href="#">LEDGER</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">PAYMENT</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">BILLING</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">REFUND</a>
-    </li>
-</ul>
 
 <div class="portal-card p-4">
-    <div class="text-center portal-header-banner">
-        {% if branding.logo %}
-            <img src="{{ branding.logo.url }}" style="height: 55px;" class="mb-2">
-        {% endif %}
-        <h5 class="fw-bold text-uppercase mb-0" style="color: var(--brand-primary);">{{ branding.school_name }}</h5>
-        <h6 class="fw-bold text-muted small mb-0">DEPARTMENT OF FINANCE</h6>
-        <h6 class="fw-bold text-success mt-1">STUDENT LEDGER</h6>
-    </div>
-
-    <div class="row g-2 mb-4 p-3 bg-light rounded border align-items-center" style="font-size: 0.85rem;">
-        <div class="col-md-2 fw-bold text-muted">NAME:</div>
-        <div class="col-md-4 text-uppercase fw-bold">{{ profile.user.get_full_name|default:request.user.username }}</div>
-        <div class="col-md-2 fw-bold text-muted">INDEX NUMBER:</div>
-        <div class="col-md-4 fw-bold">{{ profile.index_number|default:"BAF/0002/22" }}</div>
-
-        <div class="col-md-2 fw-bold text-muted">PROGRAMME:</div>
-        <div class="col-md-4 text-uppercase">{{ profile.programme|default:"BSC BANKING AND FINANCE" }}</div>
-        <div class="col-md-2 fw-bold text-muted">LEVEL:</div>
-        <div class="col-md-4">400</div>
-    </div>
+    <h6 class="fw-bold mb-3" style="color: var(--brand-primary);">Recorded Billings & Payments</h6>
 
     <div class="table-responsive">
-        <table class="table table-striped table-uds align-middle">
-            <thead class="text-uppercase">
+        <table class="table table-bordered table-striped align-middle" style="font-size: 0.85rem;">
+            <thead class="table-dark text-uppercase">
                 <tr>
-                    <th>Date</th>
+                    <th>Date Recorded</th>
+                    <th>Receipt No.</th>
+                    <th>Title / Narration</th>
                     <th>Academic Year</th>
-                    <th>Billing (GHS)</th>
-                    <th>Payment (GHS)</th>
-                    <th>Narration</th>
+                    <th>Amount Due (GHS)</th>
+                    <th>Amount Paid (GHS)</th>
+                    <th>Receipt</th>
                 </tr>
             </thead>
             <tbody>
                 {% if entries %}
-                    {% for entry in entries %}
+                    {% for fee in entries %}
                     <tr>
-                        <td>{{ entry.date_recorded|date:"d-b-Y" }}</td>
-                        <td>2026/2027</td>
-                        <td>{{ entry.amount_due }}</td>
-                        <td>{{ entry.amount_paid }}</td>
-                        <td class="fw-bold">{{ entry.title }}</td>
+                        <td>{{ fee.date_recorded|date:"d-M-Y" }}</td>
+                        <td class="fw-bold">{{ fee.receipt_number }}</td>
+                        <td>{{ fee.title }}</td>
+                        <td>{{ fee.academic_year }}</td>
+                        <td class="text-danger fw-bold">{{ fee.amount_due }}</td>
+                        <td class="text-success fw-bold">{{ fee.amount_paid }}</td>
+                        <td>
+                            <a href="{% url 'portal:fee_receipt' fee.id %}" class="btn btn-sm btn-outline-dark py-0 px-2"><i class="fa-solid fa-file-invoice me-1"></i>View Receipt</a>
+                        </td>
                     </tr>
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td>01-Sep-2026</td>
-                        <td>2026/2027</td>
-                        <td>1,484.29</td>
-                        <td>0.00</td>
-                        <td>BILLING: ACADEMIC FACILITY USER FEE</td>
-                    </tr>
-                    <tr>
-                        <td>06-Apr-2026</td>
-                        <td>2025/2026</td>
-                        <td>0.00</td>
-                        <td>618.00</td>
-                        <td>PAYMENT: ACADEMIC FACILITY USER FEE</td>
+                        <td colspan="7" class="text-center py-4 text-muted">No fee ledger entries found for this account.</td>
                     </tr>
                 {% endif %}
             </tbody>
         </table>
-    </div>
-
-    <div class="text-end mt-3">
-        <button onclick="window.print()" class="btn btn-secondary btn-sm px-4"><i class="fa-solid fa-print me-2"></i>Print Ledger</button>
     </div>
 </div>
 {% endblock %}

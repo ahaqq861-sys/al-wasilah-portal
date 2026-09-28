@@ -180,7 +180,7 @@ def manage_results_view(request):
         return redirect('portal:manage_results')
 
     students = StudentProfile.objects.filter(role='student').select_related('user')
-    all_results = AcademicResult.objects.select_related('student').all().order_by('-id')
+    all_results = AcademicResult.objects.select_related('student', 'student__profile').all().order_by('-id')
     context = {
         'branding': get_branding(),
         'profile': profile,
@@ -247,10 +247,18 @@ def manage_remarks_view(request):
 def fees_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
     entries = FeeLedger.objects.filter(student=request.user).order_by('-date_recorded')
+    
+    total_due = entries.aggregate(Sum('amount_due'))['amount_due__sum'] or 0
+    total_paid = entries.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+    balance_outstanding = total_due - total_paid
+
     context = {
         'branding': get_branding(),
         'profile': profile,
         'entries': entries,
+        'total_due': total_due,
+        'total_paid': total_paid,
+        'balance_outstanding': balance_outstanding,
     }
     return render(request, 'portal/student_fees.html', context)
 
@@ -280,7 +288,7 @@ def manage_fees_view(request):
         return redirect('portal:manage_fees')
 
     students = StudentProfile.objects.filter(role='student').select_related('user')
-    all_entries = FeeLedger.objects.select_related('student').all().order_by('-id')
+    all_entries = FeeLedger.objects.select_related('student', 'student__profile').all().order_by('-id')
     context = {
         'branding': get_branding(),
         'profile': profile,
@@ -350,10 +358,12 @@ def branding_view(request):
         branding.school_name = request.POST.get('school_name', branding.school_name)
         branding.tagline_subtext = request.POST.get('tagline_subtext', branding.tagline_subtext)
         branding.primary_color = request.POST.get('primary_color', branding.primary_color)
+        branding.secondary_color = request.POST.get('secondary_color', branding.secondary_color)
+        branding.sidebar_color = request.POST.get('sidebar_color', branding.sidebar_color)
         branding.contact_email = request.POST.get('contact_email', branding.contact_email)
         branding.contact_phone = request.POST.get('contact_phone', branding.contact_phone)
         branding.address = request.POST.get('address', branding.address)
-        branding.footer_text = request.POST.get('footer_text', branding.footer_text)
+        branding.footer_copyright = request.POST.get('footer_copyright', branding.footer_copyright)
 
         if 'logo' in request.FILES:
             branding.logo = request.FILES['logo']

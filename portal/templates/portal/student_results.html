@@ -1,99 +1,90 @@
 {% extends 'portal/base.html' %}
 
-{% block title %}Statement of Results - {{ branding.school_name }}{% endblock %}
+{% block title %}Terminal Report - {{ branding.school_name }}{% endblock %}
 
 {% block content %}
-<!-- Tab Header Navigation -->
-<ul class="nav nav-tabs nav-tabs-portal mb-3">
-    <li class="nav-item">
-        <a class="nav-link active" href="#">STATEMENT</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">DETAILS</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">UPLOADS</a>
-    </li>
-</ul>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold mb-0">Terminal Academic Report</h4>
+    <button onclick="window.print()" class="btn btn-secondary btn-sm"><i class="fa-solid fa-print me-1"></i> Print Report Card</button>
+</div>
 
 <div class="portal-card p-4">
-    <!-- Header Title Banner -->
-    <div class="text-center portal-header-banner">
+    <div class="text-center mb-4">
         {% if branding.logo %}
-            <img src="{{ branding.logo.url }}" style="height: 60px;" class="mb-2">
+            <img src="{{ branding.logo.url }}" style="height: 70px;" class="mb-2">
         {% endif %}
-        <h5 class="fw-bold text-uppercase mb-0" style="color: var(--brand-primary);">{{ branding.school_name }}</h5>
-        <h6 class="fw-bold text-muted small mb-0">DEPARTMENT OF FINANCE</h6>
-        <h6 class="fw-bold text-success mt-1">STATEMENT OF RESULTS</h6>
+        <h4 class="fw-bold text-uppercase mb-0" style="color: var(--brand-primary);">{{ branding.school_name }}</h4>
+        <h6 class="fw-bold text-muted small mb-0">{{ branding.tagline_subtext }}</h6>
+        <h6 class="fw-bold text-success mt-2 text-decoration-underline">STUDENT TERMINAL ACADEMIC REPORT</h6>
     </div>
 
-    <!-- Student Details Summary Grid -->
     <div class="row g-2 mb-4 p-3 bg-light rounded border align-items-center" style="font-size: 0.85rem;">
-        <div class="col-md-2 fw-bold text-muted">UIN:</div>
-        <div class="col-md-4">{{ profile.user.username }}</div>
-        <div class="col-md-2 fw-bold text-muted">Index No:</div>
-        <div class="col-md-4 fw-bold">{{ profile.index_number|default:"BAF/0002/22" }}</div>
-
-        <div class="col-md-2 fw-bold text-muted">Name:</div>
+        <div class="col-md-2 fw-bold text-muted">STUDENT NAME:</div>
         <div class="col-md-4 text-uppercase fw-bold">{{ profile.user.get_full_name|default:request.user.username }}</div>
-        <div class="col-md-2 fw-bold text-muted">Gender:</div>
-        <div class="col-md-4 text-uppercase">{{ profile.gender|default:"MALE" }}</div>
+        
+        <div class="col-md-2 fw-bold text-muted">INDEX / ID NO:</div>
+        <div class="col-md-4 fw-bold">{{ profile.index_number|default:request.user.username }}</div>
 
-        <div class="col-md-2 fw-bold text-muted">Programme:</div>
-        <div class="col-md-4 text-uppercase">{{ profile.programme|default:"BSC BANKING AND FINANCE" }}</div>
-        <div class="col-md-2 fw-bold text-muted">Level:</div>
-        <div class="col-md-4">400</div>
+        <div class="col-md-2 fw-bold text-muted">CLASS / LEVEL:</div>
+        <div class="col-md-4 text-uppercase">{{ profile.assigned_class }}</div>
+
+        <div class="col-md-2 fw-bold text-muted">CLASS POSITION:</div>
+        <div class="col-md-4 fw-bold text-primary">{{ overall_position }}</div>
+
+        <div class="col-md-2 fw-bold text-muted">ATTENDANCE:</div>
+        <div class="col-md-4 fw-bold">{{ profile.days_present }} / {{ profile.total_school_days }} Days</div>
+
+        <div class="col-md-2 fw-bold text-muted">CONDUCT:</div>
+        <div class="col-md-4 fw-bold text-success">{{ profile.conduct_rating }}</div>
     </div>
 
-    <!-- Results Table Breakdown -->
     <div class="table-responsive">
-        <table class="table table-bordered table-uds align-middle">
-            <thead class="text-uppercase">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark text-uppercase">
                 <tr>
-                    <th>Course Code</th>
-                    <th>Course Title</th>
-                    <th class="text-center">Credit</th>
-                    <th class="text-center">Mark</th>
-                    <th class="text-center">Grade</th>
+                    <th>Subject</th>
+                    <th>Class Score (40%)</th>
+                    <th>Exam Score (60%)</th>
+                    <th>Total Score (100%)</th>
+                    <th>Grade</th>
+                    <th>Position in Subject</th>
                 </tr>
             </thead>
             <tbody>
                 {% if results %}
                     {% for res in results %}
                     <tr>
-                        <td>{{ res.subject|slice:":7" }}</td>
-                        <td class="fw-bold">{{ res.subject }}</td>
-                        <td class="text-center">3</td>
-                        <td class="text-center">{{ res.total_score }}</td>
-                        <td class="text-center fw-bold">{{ res.grade }}</td>
+                        <td class="fw-bold">{{ res.subject_name }}</td>
+                        <td>{{ res.class_score }}</td>
+                        <td>{{ res.exam_score }}</td>
+                        <td class="fw-bold">{{ res.total_score }}</td>
+                        <td><span class="badge {% if res.grade == 'A' or res.grade == 'B' %}bg-success{% elif res.grade == 'C' or res.grade == 'D' %}bg-warning text-dark{% else %}bg-danger{% endif %}">{{ res.grade }}</span></td>
+                        <td>{{ res.position_in_subject|default:"-" }}</td>
                     </tr>
                     {% endfor %}
                 {% else %}
-                    <!-- Sample Official Format Preview -->
-                    <tr class="bg-light fw-bold"><td colspan="5">FOURTH YEAR (2025/2026) - SECOND TRIMESTER</td></tr>
                     <tr>
-                        <td>MKT 402</td>
-                        <td>CUSTOMER SERVICE AND RELATIONSHIP MARKETING</td>
-                        <td class="text-center">3</td>
-                        <td class="text-center">69</td>
-                        <td class="text-center fw-bold">B+</td>
+                        <td colspan="6" class="text-center py-4 text-muted">No results recorded for this student account.</td>
                     </tr>
                 {% endif %}
             </tbody>
         </table>
     </div>
 
-    <!-- Official Signature & Barcode Section -->
-    <div class="row mt-5 pt-3 align-items-end">
-        <div class="col-md-6">
-            <div class="border-bottom border-dark mb-1" style="width: 250px;"></div>
-            <small class="fw-bold text-muted">Signature of HoD / Date</small>
+    <div class="mt-4 p-3 border rounded bg-light">
+        <h6 class="fw-bold text-muted mb-1" style="font-size: 0.8rem;">CLASS TEACHER'S REMARKS:</h6>
+        <p class="mb-0 fw-bold text-dark">{{ profile.teacher_remarks }}</p>
+    </div>
+
+    <div class="row mt-5 pt-3 align-items-end" style="font-size: 0.85rem;">
+        <div class="col-md-6 text-center">
+            <div class="border-bottom mx-auto w-75 mb-1"></div>
+            <span class="fw-bold d-block text-muted">CLASS TEACHER'S SIGNATURE</span>
+            <small class="text-secondary">(Verified & Approved)</small>
         </div>
-        <div class="col-md-6 text-end">
-            <div class="d-inline-block text-center">
-                <i class="fa-solid fa-barcode fa-3x"></i>
-                <div class="fw-bold small">* BAF / 0002 / 22 *</div>
-            </div>
+        <div class="col-md-6 text-center">
+            <div class="border-bottom mx-auto w-75 mb-1"></div>
+            <span class="fw-bold d-block text-muted">OFFICIAL SCHOOL STAMP / DATE</span>
         </div>
     </div>
 </div>
