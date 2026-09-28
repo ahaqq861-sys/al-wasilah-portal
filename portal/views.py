@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db.models import Sum
-from .models import PortalBranding, StudentProfile, FeeLedger, AcademicResult
+from .models import PortalBranding, StudentProfile, FeeLedger, AcademicResult, Announcement
 
 def generate_random_password(length=8):
     alphabet = string.ascii_letters + string.digits
@@ -48,6 +48,8 @@ def dashboard_view(request):
         profile.can_brand_portal = True
         profile.save()
 
+    announcements = Announcement.objects.all().order_by('-date_posted')[:5]
+
     context = {
         'branding': get_branding(),
         'profile': profile,
@@ -55,6 +57,7 @@ def dashboard_view(request):
         'today_date_str': datetime.now().strftime('%d-%b-%Y'),
         'total_students': StudentProfile.objects.filter(role='student').count(),
         'total_teachers': StudentProfile.objects.filter(role='teacher').count(),
+        'announcements': announcements,
     }
     return render(request, 'portal/dashboard.html', context)
 
@@ -209,6 +212,38 @@ def edit_result_view(request, result_id):
     return render(request, 'portal/edit_result.html', context)
 
 @login_required
+def manage_remarks_view(request):
+    profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+    if profile.role not in ['admin', 'teacher'] and not request.user.is_superuser:
+        messages.error(request, "Permission denied.")
+        return redirect('portal:dashboard')
+
+    if request.method == 'POST':
+        student_id = request.POST.get('student_id')
+        days_present = request.POST.get('days_present', 0)
+        total_school_days = request.POST.get('total_school_days', 60)
+        conduct_rating = request.POST.get('conduct_rating', 'GOOD')
+        teacher_remarks = request.POST.get('teacher_remarks', '')
+
+        target_profile = get_object_or_404(StudentProfile, user_id=student_id)
+        target_profile.days_present = days_present
+        target_profile.total_school_days = total_school_days
+        target_profile.conduct_rating = conduct_rating
+        target_profile.teacher_remarks = teacher_remarks
+        target_profile.save()
+
+        messages.success(request, f"Remarks and attendance updated for {target_profile.user.get_full_name() or target_profile.user.username}")
+        return redirect('portal:manage_remarks')
+
+    students = StudentProfile.objects.filter(role='student').select_related('user')
+    context = {
+        'branding': get_branding(),
+        'profile': profile,
+        'students': students,
+    }
+    return render(request, 'portal/manage_remarks.html', context)
+
+@login_required
 def fees_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
     entries = FeeLedger.objects.filter(student=request.user).order_by('-date_recorded')
@@ -274,6 +309,37 @@ def edit_fee_view(request, entry_id):
         'entry': fee_entry,
     }
     return render(request, 'portal/edit_fee.html', context)
+
+@login_required
+def fee_receipt_view(request, entry_id):
+    profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+    fee_entry = get_object_or_404(FeeLedger, id=entry_id)
+    context = {
+        'branding': get_branding(),
+        'profile': profile,
+        'entry': fee_entry,
+    }
+    return render(request, 'portal/fee_receipt.html', context)
+
+@login_required
+def announcements_view(request):
+    profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST' and (profile.role in ['admin', 'teacher'] or request.user.is_superuser):
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        target_role = request.POST.get('target_role', 'all')
+        Announcement.objects.create(title=title, content=content, target_role=target_role)
+        messages.success(request, "Announcement posted successfully!")
+        return redirect('portal:announcements')
+
+    announcements = Announcement.objects.all().order_by('-date_posted')
+    context = {
+        'branding': get_branding(),
+        'profile': profile,
+        'announcements': announcements,
+    }
+    return render(request, 'portal/announcements.html', context)
 
 @login_required
 def branding_view(request):

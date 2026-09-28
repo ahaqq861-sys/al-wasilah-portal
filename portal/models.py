@@ -30,6 +30,12 @@ class StudentProfile(models.Model):
     gender = models.CharField(max_length=10, default="MALE")
     passport_picture = models.ImageField(upload_to="passports/", blank=True, null=True)
     can_brand_portal = models.BooleanField(default=False)
+    
+    # Feature 1: Attendance Tracking & Remarks
+    days_present = models.IntegerField(default=0)
+    total_school_days = models.IntegerField(default=60)
+    teacher_remarks = models.TextField(default="Satisfactory progress made. Keep working hard.")
+    conduct_rating = models.CharField(max_length=50, default="GOOD")
 
     def __str__(self):
         return f"{self.user.username} - {self.role}"
@@ -39,8 +45,15 @@ class FeeLedger(models.Model):
     title = models.CharField(max_length=200)
     amount_due = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    receipt_number = models.CharField(max_length=50, blank=True, null=True)
     academic_year = models.CharField(max_length=20, default="2026/2027")
     date_recorded = models.DateField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.receipt_number:
+            import random
+            self.receipt_number = f"REC-{random.randint(100000, 999999)}"
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.student.username} - {self.title}"
@@ -72,3 +85,12 @@ class AcademicResult(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.subject_name}"
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    target_role = models.CharField(max_length=20, default='all') # all, student, teacher
+    date_posted = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title

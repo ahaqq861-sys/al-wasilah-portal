@@ -121,11 +121,15 @@
             </li>
 
             <li class="{% if request.resolver_match.url_name == 'results' %}active{% endif %}">
-                <a href="{% url 'portal:results' %}"><i class="fa-solid fa-square-poll-vertical"></i> View Results</a>
+                <a href="{% url 'portal:results' %}"><i class="fa-solid fa-square-poll-vertical"></i> Terminal Report Card</a>
             </li>
 
             <li class="{% if request.resolver_match.url_name == 'fees' %}active{% endif %}">
                 <a href="{% url 'portal:fees' %}"><i class="fa-solid fa-wallet"></i> Fee Ledger</a>
+            </li>
+
+            <li class="{% if request.resolver_match.url_name == 'announcements' %}active{% endif %}">
+                <a href="{% url 'portal:announcements' %}"><i class="fa-solid fa-bullhorn"></i> Notice Board</a>
             </li>
 
             {% if profile.role == 'admin' or profile.role == 'teacher' or request.user.is_superuser %}
@@ -141,6 +145,10 @@
 
             <li class="{% if request.resolver_match.url_name == 'manage_results' %}active{% endif %}">
                 <a href="{% url 'portal:manage_results' %}"><i class="fa-solid fa-file-pen"></i> Upload & Edit Results</a>
+            </li>
+
+            <li class="{% if request.resolver_match.url_name == 'manage_remarks' %}active{% endif %}">
+                <a href="{% url 'portal:manage_remarks' %}"><i class="fa-solid fa-clipboard-check"></i> Attendance & Remarks</a>
             </li>
 
             <li class="{% if request.resolver_match.url_name == 'manage_fees' %}active{% endif %}">
