@@ -1,0 +1,52 @@
+{% extends 'portal/base.html' %}
+
+{% block title %}User Logins List - {{ branding.school_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="fw-bold mb-0">User Logins & Credentials</h4>
+        <small class="text-muted">Admin Tools / Account Logins</small>
+    </div>
+    <a href="{% url 'portal:registration' %}" class="btn btn-brand btn-sm fw-bold">
+        <i class="fa-solid fa-user-plus me-1"></i> Register New User
+    </a>
+</div>
+
+<div class="portal-card p-4">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle" style="font-size: 0.85rem;">
+            <thead class="table-dark text-uppercase">
+                <tr>
+                    <th>Username / Index No.</th>
+                    <th>Full Name</th>
+                    <th>Role</th>
+                    <th>Assigned Class</th>
+                    <th>Temporary Password</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if profiles %}
+                    {% for prof in profiles %}
+                    <tr>
+                        <td class="fw-bold">{{ prof.user.username }}</td>
+                        <td>{{ prof.user.get_full_name|default:"-" }}</td>
+                        <td>
+                            <span class="badge {% if prof.role == 'admin' %}bg-danger{% elif prof.role == 'teacher' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %} text-uppercase">
+                                {{ prof.role }}
+                            </span>
+                        </td>
+                        <td>{{ prof.assigned_class }}</td>
+                        <td><code class="fw-bold text-dark">{{ prof.generated_password|default:"ChangeMe123!" }}</code></td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-3 text-muted">No user profiles recorded.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

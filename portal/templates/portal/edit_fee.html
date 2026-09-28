@@ -1,0 +1,46 @@
+{% extends 'portal/base.html' %}
+
+{% block title %}Edit Fee Record - {{ branding.school_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold mb-0">Edit Fee Ledger Entry</h4>
+    <a href="{% url 'portal:manage_fees' %}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left me-1"></i> Back to Fees List</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="portal-card p-4">
+            <h6 class="fw-bold mb-3 pb-2 border-bottom" style="color: var(--brand-primary);">
+                Updating Ledger for {{ entry.student.get_full_name|default:entry.student.username }}
+            </h6>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Narration / Fee Title</label>
+                    <input type="text" name="title" value="{{ entry.title }}" class="form-control" required>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Amount Due (GHS)</label>
+                        <input type="number" step="0.01" name="amount_due" value="{{ entry.amount_due }}" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Amount Paid (GHS)</label>
+                        <input type="number" step="0.01" name="amount_paid" value="{{ entry.amount_paid }}" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Academic Year</label>
+                    <input type="text" name="academic_year" value="{{ entry.academic_year }}" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-brand fw-bold px-4"><i class="fa-solid fa-floppy-disk me-2"></i> Update Fee Entry</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
