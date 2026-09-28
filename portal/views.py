@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.db.models import Sum
 from .models import PortalBranding, StudentProfile, FeeLedger, AcademicResult
 
 def generate_random_password(length=8):
@@ -37,6 +38,13 @@ def login_view(request):
 @login_required
 def dashboard_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+    
+    # Auto-assign admin role to superusers if not already assigned
+    if request.user.is_superuser and profile.role != 'admin':
+        profile.role = 'admin'
+        profile.can_brand_portal = True
+        profile.save()
+
     context = {
         'branding': get_branding(),
         'profile': profile,
@@ -50,7 +58,7 @@ def dashboard_view(request):
 @login_required
 def registration_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
-    if profile.role not in ['admin', 'teacher']:
+    if profile.role not in ['admin', 'teacher'] and not request.user.is_superuser:
         messages.error(request, "Access restricted to Administrators.")
         return redirect('portal:dashboard')
 
@@ -60,7 +68,6 @@ def registration_view(request):
         role = request.POST.get('role', 'student')
         assigned_class = request.POST.get('assigned_class', 'Primary 1')
         
-        # Auto-generate username/index and temporary password
         user_count = User.objects.count() + 1
         username = request.POST.get('username') or f"AWS/{datetime.now().year}/{user_count:03d}"
         generated_password = generate_random_password()
@@ -97,7 +104,7 @@ def registration_view(request):
 @login_required
 def user_logins_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
-    if profile.role not in ['admin', 'teacher']:
+    if profile.role not in ['admin', 'teacher'] and not request.user.is_superuser:
         messages.error(request, "Access restricted.")
         return redirect('portal:dashboard')
 
@@ -112,17 +119,37 @@ def user_logins_view(request):
 def results_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
     results = AcademicResult.objects.filter(student=request.user)
+    
+    class_students = StudentProfile.objects.filter(assigned_class=profile.assigned_class, role='student')
+    student_totals = []
+    
+    for s_prof in class_students:
+        tot_score = AcademicResult.objects.filter(student=s_prof.user).aggregate(Sum('total_score'))['total_score__sum'] or 0
+        student_totals.append((s_prof.user.id, tot_score))
+        
+    student_totals.sort(key=lambda x: x[1], reverse=True)
+    
+    overall_position = "N/A"
+    total_in_class = len(student_totals)
+    
+    for rank, (user_id, score) in enumerate(student_totals, 1):
+        if user_id == request.user.id:
+            ordinal = lambda n: "%d%s" % (n, "tsnkrh"[n%10==1 and n%100!=11::4] if n%10<4 and not 11<=n%100<=13 else "th")
+            overall_position = f"{ordinal(rank)} / {total_in_class}"
+            break
+
     context = {
         'branding': get_branding(),
         'profile': profile,
         'results': results,
+        'overall_position': overall_position,
     }
     return render(request, 'portal/student_results.html', context)
 
 @login_required
 def manage_results_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
-    if profile.role not in ['admin', 'teacher']:
+    if profile.role not in ['admin', 'teacher'] and not request.user.is_superuser:
         messages.error(request, "Permission denied.")
         return redirect('portal:dashboard')
 
@@ -132,6 +159,7 @@ def manage_results_view(request):
         class_score = request.POST.get('class_score', 0)
         exam_score = request.POST.get('exam_score', 0)
         academic_term = request.POST.get('academic_term', 'Term 1')
+        position_in_subject = request.POST.get('position_in_subject', '')
 
         student_user = get_object_or_404(User, id=student_id)
         AcademicResult.objects.create(
@@ -139,6 +167,7 @@ def manage_results_view(request):
             subject_name=subject_name,
             class_score=class_score,
             exam_score=exam_score,
+            position_in_subject=position_in_subject,
             academic_term=academic_term
         )
         messages.success(request, f"Result added for {student_user.get_full_name() or student_user.username}")
@@ -163,6 +192,7 @@ def edit_result_view(request, result_id):
         result.subject_name = request.POST.get('subject_name', result.subject_name)
         result.class_score = request.POST.get('class_score', result.class_score)
         result.exam_score = request.POST.get('exam_score', result.exam_score)
+        result.position_in_subject = request.POST.get('position_in_subject', result.position_in_subject)
         result.academic_term = request.POST.get('academic_term', result.academic_term)
         result.save()
         messages.success(request, "Academic result entry updated successfully.")
@@ -189,7 +219,7 @@ def fees_view(request):
 @login_required
 def manage_fees_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
-    if profile.role not in ['admin', 'teacher']:
+    if profile.role not in ['admin', 'teacher'] and not request.user.is_superuser:
         messages.error(request, "Permission denied.")
         return redirect('portal:dashboard')
 

@@ -116,7 +116,7 @@
                 <a href="{% url 'portal:fees' %}"><i class="fa-solid fa-wallet"></i> Fee Ledger</a>
             </li>
 
-            {% if profile.role == 'admin' or profile.role == 'teacher' %}
+            {% if profile.role == 'admin' or profile.role == 'teacher' or request.user.is_superuser %}
             <li class="px-3 pt-3 pb-1 text-uppercase text-muted fw-bold" style="font-size: 0.65rem;">Management Tools</li>
 
             <li class="{% if request.resolver_match.url_name == 'registration' %}active{% endif %}">
@@ -136,7 +136,7 @@
             </li>
             {% endif %}
 
-            {% if profile.role == 'admin' or profile.can_brand_portal %}
+            {% if profile.role == 'admin' or profile.can_brand_portal or request.user.is_superuser %}
             <li class="{% if request.resolver_match.url_name == 'branding' %}active{% endif %}">
                 <a href="{% url 'portal:branding' %}"><i class="fa-solid fa-palette"></i> Portal Branding</a>
             </li>

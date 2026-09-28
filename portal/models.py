@@ -48,10 +48,11 @@ class FeeLedger(models.Model):
 class AcademicResult(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='academic_results')
     subject_name = models.CharField(max_length=100)
-    class_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.00) # 30 or 40%
-    exam_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.00) # 70 or 60%
+    class_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    exam_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     total_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     grade = models.CharField(max_length=5, blank=True, null=True)
+    position_in_subject = models.CharField(max_length=20, blank=True, null=True)
     academic_term = models.CharField(max_length=50, default="Term 1")
     academic_year = models.CharField(max_length=20, default="2026/2027")
 
