@@ -17,6 +17,10 @@ def get_branding():
     branding, _ = PortalBranding.objects.get_or_create(id=1)
     return branding
 
+def placeholder_view(request, feature=None):
+    messages.info(request, f"The feature '{feature}' is currently under active development.")
+    return redirect('portal:dashboard')
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('portal:dashboard')
@@ -39,6 +43,7 @@ def login_view(request):
 def dashboard_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
     
+    # Auto-assign admin role to superusers if not already assigned
     if request.user.is_superuser and profile.role != 'admin':
         profile.role = 'admin'
         profile.can_brand_portal = True
