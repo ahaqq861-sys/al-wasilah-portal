@@ -4,41 +4,68 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="fw-bold mb-0">Portal Branding</h4>
-    <small class="text-muted">Admin / Settings</small>
+    <h4 class="fw-bold mb-0">Portal Custom Branding</h4>
+    <small class="text-muted">Admin / Portal Settings</small>
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-lg-9">
         <div class="portal-card p-4">
             <h6 class="fw-bold mb-3 border-bottom pb-2" style="color: var(--brand-primary);">
-                <i class="fa-solid fa-sliders me-2"></i>Custom Branding & School Information
+                <i class="fa-solid fa-palette me-2"></i>Customize Portal Identity & Visuals
             </h6>
+
             <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="mb-3">
-                    <label class="form-label small fw-bold">School Name</label>
-                    <input type="text" name="school_name" value="{{ branding.school_name }}" class="form-control" required>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-bold">School Name</label>
+                        <input type="text" name="school_name" value="{{ branding.school_name }}" class="form-control" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Theme Primary Color</label>
+                        <input type="color" name="primary_color" value="{{ branding.primary_color }}" class="form-control form-control-color w-100">
+                    </div>
                 </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">School Tagline / Subtitle Text</label>
+                    <input type="text" name="tagline_subtext" value="{{ branding.tagline_subtext }}" class="form-control">
+                </div>
+
                 <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                        <label class="form-label small fw-bold">Contact Email</label>
+                        <label class="form-label small fw-bold">Official Contact Email</label>
                         <input type="email" name="contact_email" value="{{ branding.contact_email }}" class="form-control" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label small fw-bold">Contact Phone</label>
+                        <label class="form-label small fw-bold">Official Phone Number</label>
                         <input type="text" name="contact_phone" value="{{ branding.contact_phone }}" class="form-control" required>
                     </div>
                 </div>
+
                 <div class="mb-3">
-                    <label class="form-label small fw-bold">Address</label>
+                    <label class="form-label small fw-bold">Physical Address Location</label>
                     <textarea name="address" class="form-control" rows="2">{{ branding.address }}</textarea>
                 </div>
-                <div class="mb-4">
-                    <label class="form-label small fw-bold">School Crest / Logo</label>
-                    <input type="file" name="logo" class="form-control">
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Custom Portal Footer Notice</label>
+                    <input type="text" name="footer_text" value="{{ branding.footer_text }}" class="form-control">
                 </div>
-                <button type="submit" class="btn btn-brand fw-bold px-4">Save Branding Changes</button>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">Upload School Crest / Crest Logo</label>
+                    <input type="file" name="logo" class="form-control">
+                    {% if branding.logo %}
+                        <div class="mt-2">
+                            <small class="text-muted d-block mb-1">Current Crest:</small>
+                            <img src="{{ branding.logo.url }}" style="height: 50px;" class="rounded border p-1">
+                        </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-brand fw-bold px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Save Branding Settings</button>
             </form>
         </div>
     </div>
