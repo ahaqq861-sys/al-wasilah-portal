@@ -9,16 +9,17 @@
     <style>
         body {
             background-color: #f4f6f9;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .login-card {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             background: #fff;
             border-top: 5px solid {{ branding.primary_color|default:"#800020" }};
         }
@@ -35,14 +36,14 @@
 <body>
 
 <div class="login-card p-4">
-    <div class="text-center mb-4">
+    <div class="text-center mb-3">
         {% if branding.logo %}
-            <img src="{{ branding.logo.url }}" style="height: 60px;" class="mb-2">
+            <img src="{{ branding.logo.url }}" style="height: 75px; object-fit: contain;" class="mb-2">
         {% else %}
-            <i class="fa-solid fa-graduation-cap fa-3x text-secondary mb-2"></i>
+            <img src="/static/images/logo.png" style="height: 75px; object-fit: contain;" class="mb-2">
         {% endif %}
         <h5 class="fw-bold mb-0" style="color: {{ branding.primary_color|default:"#800020" }};">{{ branding.school_name }}</h5>
-        <small class="text-muted">{{ branding.tagline_subtext }}</small>
+        <small class="text-muted d-block fw-semibold">{{ branding.tagline_subtext|default:"Knowledge, Integrity and Excellence" }}</small>
     </div>
 
     {% if messages %}
@@ -58,14 +59,20 @@
         {% csrf_token %}
         <div class="mb-3">
             <label class="form-label small fw-bold">Index Number / Username</label>
-            <input type="text" name="username" class="form-control" required placeholder="Enter your ID or username">
+            <input type="text" name="username" class="form-control form-control-sm" required placeholder="Enter your ID or username">
         </div>
         <div class="mb-3">
             <label class="form-label small fw-bold">Password</label>
-            <input type="password" name="password" class="form-control" required placeholder="Enter password">
+            <input type="password" name="password" class="form-control form-control-sm" required placeholder="Enter password">
         </div>
-        <button type="submit" class="btn btn-brand w-100 fw-bold">Sign In</button>
+        <button type="submit" class="btn btn-brand w-100 fw-bold btn-sm py-2">Sign In</button>
     </form>
+
+    <div class="mt-4 pt-3 border-top text-center text-muted" style="font-size: 0.78rem;">
+        <p class="mb-1 fw-bold text-dark"><i class="fa-solid fa-location-dot me-1 text-danger"></i>{{ branding.address|default:"Tamale, Northern Region, Ghana" }}</p>
+        <p class="mb-1"><i class="fa-solid fa-phone me-1 text-success"></i>Phone: {{ branding.contact_phone|default:"+233 24 000 0000" }}</p>
+        <p class="mb-0"><i class="fa-solid fa-envelope me-1 text-primary"></i>Email: {{ branding.contact_email|default:"info@alwasilah.edu.gh" }}</p>
+    </div>
 </div>
 
 </body>

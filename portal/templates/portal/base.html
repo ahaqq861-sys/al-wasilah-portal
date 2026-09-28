@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ branding.school_name }}{% endblock %}</title>
 
-    <!-- FAVICON (School logo on browser tab bar) -->
     {% if branding.logo %}
         <link rel="icon" type="image/png" href="{{ branding.logo.url }}">
-        <link rel="apple-touch-icon" href="{{ branding.logo.url }}">
     {% else %}
-        <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/graduation-cap.png">
+        <link rel="icon" type="image/png" href="/static/images/logo.png">
     {% endif %}
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -50,7 +48,7 @@
             align-items: center;
             color: #abb2bf;
             text-decoration: none;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.2s;
         }
 
         #sidebar ul li a:hover, #sidebar ul li.active > a {
@@ -92,13 +90,12 @@
 <body>
 
 <div class="d-flex">
-    <!-- Sidebar Navigation -->
     <nav id="sidebar">
         <div class="sidebar-header d-flex align-items-center">
             {% if branding.logo %}
                 <img src="{{ branding.logo.url }}" class="rounded-circle me-2" style="width: 38px; height: 38px; object-fit: cover; border: 2px solid #fff;">
             {% else %}
-                <i class="fa-solid fa-graduation-cap fa-2x me-2"></i>
+                <img src="/static/images/logo.png" class="rounded-circle me-2" style="width: 38px; height: 38px; object-fit: cover; border: 2px solid #fff;">
             {% endif %}
             <div class="lh-1">
                 <h6 class="fw-bold mb-0 text-truncate" style="max-width: 170px; color: #fff;">{{ branding.school_name }}</h6>
@@ -163,11 +160,13 @@
         </ul>
     </nav>
 
-    <!-- Main Content Area -->
     <div class="w-100">
         <nav class="navbar navbar-expand-lg top-navbar navbar-dark px-3">
-            <div class="container-fluid p-0">
-                <span class="navbar-brand mb-0 h1 fs-6 fw-bold text-white"><i class="fa-solid fa-school me-2"></i>{{ branding.school_name }}</span>
+            <div class="container-fluid p-0 d-flex align-items-center">
+                {% if branding.logo %}
+                    <img src="{{ branding.logo.url }}" class="me-2" style="height: 30px; width: 30px; object-fit: contain;">
+                {% endif %}
+                <span class="navbar-brand mb-0 h1 fs-6 fw-bold text-white">{{ branding.school_name }}</span>
             </div>
         </nav>
 
