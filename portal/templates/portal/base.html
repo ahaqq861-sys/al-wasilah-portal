@@ -4,8 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ branding.school_name }}{% endblock %}</title>
+
+    <!-- FAVICON (School logo on browser tab bar) -->
+    {% if branding.logo %}
+        <link rel="icon" type="image/png" href="{{ branding.logo.url }}">
+        <link rel="apple-touch-icon" href="{{ branding.logo.url }}">
+    {% else %}
+        <link rel="icon" type="image/png" href="https://img.icons8.com/color/48/graduation-cap.png">
+    {% endif %}
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
             --brand-primary: {{ branding.primary_color|default:"#800020" }};
@@ -17,7 +27,7 @@
         body {
             background-color: #f4f6f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
         }
 
         #sidebar {
@@ -40,6 +50,7 @@
             align-items: center;
             color: #abb2bf;
             text-decoration: none;
+            transition: all 0.2s ease-in-out;
         }
 
         #sidebar ul li a:hover, #sidebar ul li.active > a {
@@ -56,17 +67,20 @@
 
         .top-navbar {
             background-color: var(--brand-primary) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .portal-card {
             background: #fff;
-            border-radius: 4px;
+            border-radius: 6px;
             border: 1px solid #e1e6eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .btn-brand {
             background-color: var(--brand-primary);
             color: #fff;
+            border: none;
         }
 
         .btn-brand:hover {
@@ -78,16 +92,17 @@
 <body>
 
 <div class="d-flex">
+    <!-- Sidebar Navigation -->
     <nav id="sidebar">
         <div class="sidebar-header d-flex align-items-center">
             {% if branding.logo %}
-                <img src="{{ branding.logo.url }}" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
+                <img src="{{ branding.logo.url }}" class="rounded-circle me-2" style="width: 38px; height: 38px; object-fit: cover; border: 2px solid #fff;">
             {% else %}
                 <i class="fa-solid fa-graduation-cap fa-2x me-2"></i>
             {% endif %}
             <div class="lh-1">
-                <h6 class="fw-bold mb-0 text-truncate" style="max-width: 170px;">{{ branding.school_name }}</h6>
-                <small class="text-warning" style="font-size: 0.7rem;">MANAGEMENT PORTAL</small>
+                <h6 class="fw-bold mb-0 text-truncate" style="max-width: 170px; color: #fff;">{{ branding.school_name }}</h6>
+                <small class="text-warning fw-semibold" style="font-size: 0.68rem;">MANAGEMENT PORTAL</small>
             </div>
         </div>
 
@@ -148,16 +163,19 @@
         </ul>
     </nav>
 
+    <!-- Main Content Area -->
     <div class="w-100">
         <nav class="navbar navbar-expand-lg top-navbar navbar-dark px-3">
-            <span class="navbar-brand mb-0 h1 fs-6 fw-bold text-white"><i class="fa-solid fa-school me-2"></i>{{ branding.school_name }}</span>
+            <div class="container-fluid p-0">
+                <span class="navbar-brand mb-0 h1 fs-6 fw-bold text-white"><i class="fa-solid fa-school me-2"></i>{{ branding.school_name }}</span>
+            </div>
         </nav>
 
         <div class="container-fluid p-4">
             {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }} alert-dismissible fade show small py-2" role="alert">
-                        {{ message }}
+                        <i class="fa-solid fa-circle-info me-2"></i>{{ message }}
                         <button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}

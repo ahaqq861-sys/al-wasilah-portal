@@ -39,7 +39,6 @@ def login_view(request):
 def dashboard_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
     
-    # Auto-assign admin role to superusers if not already assigned
     if request.user.is_superuser and profile.role != 'admin':
         profile.role = 'admin'
         profile.can_brand_portal = True
@@ -298,11 +297,6 @@ def branding_view(request):
         'profile': profile,
     }
     return render(request, 'portal/branding.html', context)
-
-@login_required
-def placeholder_view(request, feature):
-    messages.info(request, f"The '{feature}' feature is under active development.")
-    return redirect('portal:dashboard')
 
 def logout_view(request):
     logout(request)
