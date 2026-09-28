@@ -10,8 +10,6 @@
         :root {
             --brand-primary: {{ branding.primary_color|default:"#800020" }};
             --brand-dark: #4a0012;
-            --brand-light: #f8f1f3;
-            --brand-accent: #ffc107;
             --sidebar-bg: #1e2229;
             --sidebar-hover: #2a2f38;
         }
@@ -23,11 +21,10 @@
         }
 
         #sidebar {
-            width: 250px;
+            width: 260px;
             min-height: 100vh;
             background-color: var(--sidebar-bg);
             color: #abb2bf;
-            transition: all 0.3s;
         }
 
         #sidebar .sidebar-header {
@@ -36,18 +33,13 @@
             padding: 15px;
         }
 
-        #sidebar ul.components {
-            padding: 10px 0;
-        }
-
         #sidebar ul li a {
             padding: 12px 20px;
-            font-size: 0.92rem;
+            font-size: 0.88rem;
             display: flex;
             align-items: center;
             color: #abb2bf;
             text-decoration: none;
-            transition: 0.2s;
         }
 
         #sidebar ul li a:hover, #sidebar ul li.active > a {
@@ -64,46 +56,12 @@
 
         .top-navbar {
             background-color: var(--brand-primary) !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .portal-card {
             background: #fff;
             border-radius: 4px;
             border: 1px solid #e1e6eb;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .portal-header-banner {
-            border-bottom: 2px solid var(--brand-primary);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .table-uds {
-            font-size: 0.85rem;
-        }
-
-        .table-uds th {
-            background-color: #f8f9fa;
-            color: #333;
-            font-weight: 600;
-            border-bottom: 2px solid #dee2e6;
-        }
-
-        .nav-tabs-portal .nav-link {
-            color: #495057;
-            font-weight: 600;
-            border: none;
-            border-bottom: 3px solid transparent;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-        }
-
-        .nav-tabs-portal .nav-link.active {
-            color: var(--brand-primary);
-            border-bottom: 3px solid var(--brand-primary);
-            background: transparent;
         }
 
         .btn-brand {
@@ -116,7 +74,6 @@
             color: #fff;
         }
     </style>
-    {% block extra_css %}{% endblock %}
 </head>
 <body>
 
@@ -124,13 +81,13 @@
     <nav id="sidebar">
         <div class="sidebar-header d-flex align-items-center">
             {% if branding.logo %}
-                <img src="{{ branding.logo.url }}" alt="Logo" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
+                <img src="{{ branding.logo.url }}" class="rounded-circle me-2" style="width: 35px; height: 35px; object-fit: cover;">
             {% else %}
                 <i class="fa-solid fa-graduation-cap fa-2x me-2"></i>
             {% endif %}
             <div class="lh-1">
                 <h6 class="fw-bold mb-0 text-truncate" style="max-width: 170px;">{{ branding.school_name }}</h6>
-                <small class="text-warning" style="font-size: 0.7rem;">PORTAL v5.3.0</small>
+                <small class="text-warning" style="font-size: 0.7rem;">MANAGEMENT PORTAL</small>
             </div>
         </div>
 
@@ -150,16 +107,32 @@
             <li class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                 <a href="{% url 'portal:dashboard' %}"><i class="fa-solid fa-house"></i> Home / Dashboard</a>
             </li>
+
             <li class="{% if request.resolver_match.url_name == 'results' %}active{% endif %}">
-                <a href="{% url 'portal:results' %}"><i class="fa-solid fa-square-poll-vertical"></i> Academics / Results</a>
+                <a href="{% url 'portal:results' %}"><i class="fa-solid fa-square-poll-vertical"></i> View Results</a>
             </li>
+
             <li class="{% if request.resolver_match.url_name == 'fees' %}active{% endif %}">
-                <a href="{% url 'portal:fees' %}"><i class="fa-solid fa-wallet"></i> Finance / Student Ledger</a>
+                <a href="{% url 'portal:fees' %}"><i class="fa-solid fa-wallet"></i> Fee Ledger</a>
             </li>
-            
+
             {% if profile.role == 'admin' or profile.role == 'teacher' %}
+            <li class="px-3 pt-3 pb-1 text-uppercase text-muted fw-bold" style="font-size: 0.65rem;">Management Tools</li>
+
             <li class="{% if request.resolver_match.url_name == 'registration' %}active{% endif %}">
                 <a href="{% url 'portal:registration' %}"><i class="fa-solid fa-user-plus"></i> User Registration</a>
+            </li>
+
+            <li class="{% if request.resolver_match.url_name == 'user_logins' %}active{% endif %}">
+                <a href="{% url 'portal:user_logins' %}"><i class="fa-solid fa-key"></i> User Logins List</a>
+            </li>
+
+            <li class="{% if request.resolver_match.url_name == 'manage_results' %}active{% endif %}">
+                <a href="{% url 'portal:manage_results' %}"><i class="fa-solid fa-file-pen"></i> Upload & Edit Results</a>
+            </li>
+
+            <li class="{% if request.resolver_match.url_name == 'manage_fees' %}active{% endif %}">
+                <a href="{% url 'portal:manage_fees' %}"><i class="fa-solid fa-file-invoice-dollar"></i> Upload & Edit Fees</a>
             </li>
             {% endif %}
 
@@ -177,17 +150,7 @@
 
     <div class="w-100">
         <nav class="navbar navbar-expand-lg top-navbar navbar-dark px-3">
-            <button type="button" id="sidebarCollapse" class="btn btn-link text-white me-3 p-0">
-                <i class="fa-solid fa-bars fa-lg"></i>
-            </button>
-            <span class="navbar-brand mb-0 h1 fs-6 fw-bold text-white"><i class="fa-solid fa-house me-2"></i>Home</span>
-
-            <div class="ms-auto d-flex align-items-center text-white">
-                <a href="#" class="text-white me-3"><i class="fa-solid fa-magnifying-glass"></i></a>
-                <a href="#" class="text-white me-3"><i class="fa-solid fa-user"></i></a>
-                <a href="#" class="text-white me-3"><i class="fa-solid fa-arrows-rotate"></i></a>
-                <a href="#" class="text-white"><i class="fa-solid fa-border-all"></i></a>
-            </div>
+            <span class="navbar-brand mb-0 h1 fs-6 fw-bold text-white"><i class="fa-solid fa-school me-2"></i>{{ branding.school_name }}</span>
         </nav>
 
         <div class="container-fluid p-4">
