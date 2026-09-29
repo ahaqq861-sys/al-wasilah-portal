@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class PortalBranding(models.Model):
     school_name = models.CharField(max_length=255, default="AL-WASILAH SCHOOL COMPLEX")
@@ -45,7 +46,7 @@ class FeeLedger(models.Model):
     amount_due = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     academic_year = models.CharField(max_length=50, default="2026/2027")
-    date_recorded = models.DateTimeField(auto_now_add=True)
+    date_recorded = models.DateTimeField(default=timezone.now)
 
     @property
     def balance(self):
@@ -58,7 +59,7 @@ class AcademicResult(models.Model):
     exam_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
     position_in_subject = models.CharField(max_length=20, blank=True, null=True)
     academic_term = models.CharField(max_length=50, default="Term 1")
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     @property
     def total_score(self):
@@ -77,7 +78,7 @@ class Announcement(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     target_role = models.CharField(max_length=50, default="all")
-    date_posted = models.DateTimeField(auto_now_add=True)
+    date_posted = models.DateTimeField(default=timezone.now)
 
 class TimetableEntry(models.Model):
     class_name = models.CharField(max_length=50, default="Primary 1")
