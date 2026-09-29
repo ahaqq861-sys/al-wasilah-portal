@@ -45,39 +45,19 @@
                     </div>
                 </div>
 
-                <div class="row g-3 mb-3">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Contact Phone Number</label>
-                        <input type="text" name="contact_phone" value="{{ branding.contact_phone }}" class="form-control" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">Contact Email Address</label>
-                        <input type="email" name="contact_email" value="{{ branding.contact_email }}" class="form-control" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold">School Address</label>
-                        <input type="text" name="address" value="{{ branding.address }}" class="form-control" required>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Footer Copyright Notice</label>
-                    <input type="text" name="footer_copyright" value="{{ branding.footer_copyright }}" class="form-control" required>
-                </div>
-
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Upload Official School Crest Logo</label>
                         <input type="file" name="logo" class="form-control" accept="image/*">
                         {% if branding.logo %}
-                            <small class="text-success d-block mt-1"><i class="fa-solid fa-check me-1"></i>Current logo uploaded: {{ branding.logo.name }}</small>
+                            <small class="text-success d-block mt-1"><i class="fa-solid fa-check me-1"></i>Current logo active</small>
                         {% endif %}
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-bold">Upload Login Page Background Picture</label>
                         <input type="file" name="login_background" class="form-control" accept="image/*">
                         {% if branding.login_background %}
-                            <small class="text-success d-block mt-1"><i class="fa-solid fa-check me-1"></i>Current background uploaded: {{ branding.login_background.name }}</small>
+                            <small class="text-success d-block mt-1"><i class="fa-solid fa-check me-1"></i>Current background active</small>
                         {% endif %}
                     </div>
                 </div>
