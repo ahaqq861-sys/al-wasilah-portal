@@ -31,6 +31,16 @@ class StudentProfile(models.Model):
     generated_password = models.CharField(max_length=50, blank=True, null=True, default="123456")
     must_change_password = models.BooleanField(default=False)
     can_brand_portal = models.BooleanField(default=False)
+    
+    # Extra Details for Students & Teachers
+    phone_number = models.CharField(max_length=30, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    
+    # Guardian Details (For Students)
+    guardian_name = models.CharField(max_length=150, blank=True, null=True)
+    guardian_phone = models.CharField(max_length=30, blank=True, null=True)
+    guardian_address = models.CharField(max_length=255, blank=True, null=True)
+    
     passport_picture = models.ImageField(upload_to='passports/', blank=True, null=True)
     days_present = models.IntegerField(default=0)
     total_school_days = models.IntegerField(default=60)

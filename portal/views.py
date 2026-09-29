@@ -8,7 +8,8 @@ from django.db.models import Sum
 from .models import PortalBranding, StudentProfile, FeeLedger, AcademicResult, Announcement, TimetableEntry
 
 def get_branding():
-    branding, _ = PortalBranding.objects.get_or_create(id=1)
+    # Force query to ensure cached/fresh record is returned instantly
+    branding, created = PortalBranding.objects.get_or_create(id=1)
     return branding
 
 def login_view(request):
@@ -119,6 +120,45 @@ def dashboard_view(request):
     return render(request, 'portal/dashboard.html', context)
 
 @login_required
+def admin_oversight_view(request):
+    profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+    if profile.role not in ['admin', 'teacher'] and not request.user.is_superuser:
+        return redirect('portal:dashboard')
+
+    students_query = StudentProfile.objects.filter(role='student')
+    
+    # If user is a teacher, restrict oversight strictly to their assigned class
+    if profile.role == 'teacher' and not request.user.is_superuser:
+        selected_class = profile.assigned_class
+        students_query = students_query.filter(assigned_class=selected_class)
+    else:
+        selected_class = request.GET.get('class_name', 'All')
+        if selected_class != 'All':
+            students_query = students_query.filter(assigned_class=selected_class)
+
+    student_data = []
+    for s in students_query:
+        res = AcademicResult.objects.filter(student=s.user)
+        fee = FeeLedger.objects.filter(student=s.user)
+        total_due = fee.aggregate(Sum('amount_due'))['amount_due__sum'] or 0
+        total_paid = fee.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        student_data.append({
+            'profile': s,
+            'results': res,
+            'total_due': total_due,
+            'total_paid': total_paid,
+            'balance': total_due - total_paid
+        })
+
+    context = {
+        'branding': get_branding(),
+        'profile': profile,
+        'student_data': student_data,
+        'selected_class': selected_class,
+    }
+    return render(request, 'portal/admin_oversight.html', context)
+
+@login_required
 def timetable_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
     entries = TimetableEntry.objects.filter(class_name=profile.assigned_class).order_by('day_of_week', 'period_time')
@@ -161,8 +201,16 @@ def registration_view(request):
             new_profile.index_number = username
             new_profile.generated_password = '123456'
             new_profile.must_change_password = True
-            if role == 'student' and 'passport_picture' in request.FILES:
-                new_profile.passport_picture = request.FILES['passport_picture']
+            new_profile.phone_number = request.POST.get('phone_number')
+            new_profile.address = request.POST.get('address')
+
+            if role == 'student':
+                new_profile.guardian_name = request.POST.get('guardian_name')
+                new_profile.guardian_phone = request.POST.get('guardian_phone')
+                new_profile.guardian_address = request.POST.get('guardian_address')
+                if 'passport_picture' in request.FILES:
+                    new_profile.passport_picture = request.FILES['passport_picture']
+                    
             new_profile.save()
 
             messages.success(request, f"Account created! ID: {username} | Default Password: 123456")
@@ -290,20 +338,25 @@ def announcements_view(request):
 @login_required
 def branding_view(request):
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+    if profile.role != 'admin' and not request.user.is_superuser:
+        return redirect('portal:dashboard')
+        
     branding = get_branding()
     if request.method == 'POST':
         branding.school_name = request.POST.get('school_name', branding.school_name)
         branding.tagline_subtext = request.POST.get('tagline_subtext', branding.tagline_subtext)
         branding.primary_color = request.POST.get('primary_color', branding.primary_color)
         branding.secondary_color = request.POST.get('secondary_color', branding.secondary_color)
+        branding.sidebar_color = request.POST.get('sidebar_color', branding.sidebar_color)
         branding.contact_phone = request.POST.get('contact_phone', branding.contact_phone)
         branding.contact_email = request.POST.get('contact_email', branding.contact_email)
         branding.address = request.POST.get('address', branding.address)
         if 'logo' in request.FILES: branding.logo = request.FILES['logo']
         if 'login_background' in request.FILES: branding.login_background = request.FILES['login_background']
         branding.save()
-        messages.success(request, "Branding and school contact details updated successfully.")
+        messages.success(request, "Branding and theme settings updated successfully!")
         return redirect('portal:branding')
+        
     context = {'branding': branding, 'profile': profile}
     return render(request, 'portal/branding.html', context)
 
