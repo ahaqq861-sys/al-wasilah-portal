@@ -6,7 +6,7 @@ from portal.views import login_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', login_view, name='login'),
+    path('', login_view, name='login'), # Clicking portal link immediately demands login
     path('portal/', include('portal.urls')),
 ]
 

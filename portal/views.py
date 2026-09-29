@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db.models import Sum
-from .models import PortalBranding, StudentProfile, FeeLedger, AcademicResult, Announcement
+from .models import PortalBranding, StudentProfile, FeeLedger, AcademicResult, Announcement, TimetableEntry
 
 def generate_random_password(length=8):
     alphabet = string.ascii_letters + string.digits
@@ -16,10 +16,6 @@ def generate_random_password(length=8):
 def get_branding():
     branding, _ = PortalBranding.objects.get_or_create(id=1)
     return branding
-
-def placeholder_view(request, feature=None):
-    messages.info(request, f"The feature '{feature}' is under active development.")
-    return redirect('portal:dashboard')
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -49,17 +45,51 @@ def dashboard_view(request):
         profile.save()
 
     announcements = Announcement.objects.all().order_by('-date_posted')[:5]
+    today_name = datetime.now().strftime('%A')
+    today_schedule = TimetableEntry.objects.filter(day_of_week=today_name, class_name=profile.assigned_class)
 
     context = {
         'branding': get_branding(),
         'profile': profile,
-        'today_day_name': datetime.now().strftime('%A'),
+        'today_day_name': today_name,
         'today_date_str': datetime.now().strftime('%d-%b-%Y'),
         'total_students': StudentProfile.objects.filter(role='student').count(),
         'total_teachers': StudentProfile.objects.filter(role='teacher').count(),
         'announcements': announcements,
+        'today_schedule': today_schedule,
     }
     return render(request, 'portal/dashboard.html', context)
+
+@login_required
+def timetable_view(request):
+    profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+    entries = TimetableEntry.objects.filter(class_name=profile.assigned_class).order_by('day_of_week', 'period_time')
+    
+    if request.method == 'POST' and (profile.role in ['admin', 'teacher'] or request.user.is_superuser):
+        class_name = request.POST.get('class_name')
+        day_of_week = request.POST.get('day_of_week')
+        period_time = request.POST.get('period_time')
+        subject_name = request.POST.get('subject_name')
+        teacher_name = request.POST.get('teacher_name')
+        venue = request.POST.get('venue')
+
+        TimetableEntry.objects.create(
+            class_name=class_name,
+            day_of_week=day_of_week,
+            period_time=period_time,
+            subject_name=subject_name,
+            teacher_name=teacher_name,
+            venue=venue
+        )
+        messages.success(request, "Timetable period added successfully!")
+        return redirect('portal:timetable')
+
+    context = {
+        'branding': get_branding(),
+        'profile': profile,
+        'entries': entries,
+    }
+    return render(request, 'portal/timetable.html', context)
 
 @login_required
 def registration_view(request):
@@ -367,6 +397,8 @@ def branding_view(request):
 
         if 'logo' in request.FILES:
             branding.logo = request.FILES['logo']
+        if 'login_background' in request.FILES:
+            branding.login_background = request.FILES['login_background']
 
         branding.save()
         messages.success(request, "Portal branding settings updated successfully!")

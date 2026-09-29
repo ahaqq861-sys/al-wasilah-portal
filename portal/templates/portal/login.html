@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background-color: #f4f6f9;
+            {% if branding.login_background %}
+                background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ branding.login_background.url }}') no-repeat center center fixed;
+                background-size: cover;
+            {% else %}
+                background-color: #f4f6f9;
+            {% endif %}
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -19,8 +24,8 @@
             width: 100%;
             max-width: 420px;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            background: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.95);
             border-top: 5px solid {{ branding.primary_color|default:"#800020" }};
         }
         .btn-brand {
@@ -59,7 +64,7 @@
         {% csrf_token %}
         <div class="mb-3">
             <label class="form-label small fw-bold">Index Number / Username</label>
-            <input type="text" name="username" class="form-control form-control-sm" required placeholder="Enter your ID or username">
+            <input type="text" name="username" class="form-control form-control-sm" required placeholder="Enter ID or username">
         </div>
         <div class="mb-3">
             <label class="form-label small fw-bold">Password</label>

@@ -7,6 +7,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('results/', views.results_view, name='results'),
     path('fees/', views.fees_view, name='fees'),
+    path('timetable/', views.timetable_view, name='timetable'),
     path('registration/', views.registration_view, name='registration'),
     path('user-logins/', views.user_logins_view, name='user_logins'),
     path('manage-results/', views.manage_results_view, name='manage_results'),
@@ -17,6 +18,5 @@ urlpatterns = [
     path('remarks/', views.manage_remarks_view, name='manage_remarks'),
     path('announcements/', views.announcements_view, name='announcements'),
     path('branding/', views.branding_view, name='branding'),
-    path('placeholder/<str:feature>/', views.placeholder_view, name='placeholder'),
     path('logout/', views.logout_view, name='logout'),
 ]

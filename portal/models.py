@@ -4,10 +4,11 @@ from django.contrib.auth.models import User
 class PortalBranding(models.Model):
     school_name = models.CharField(max_length=255, default="AL-WASILAH SCHOOL COMPLEX")
     tagline_subtext = models.CharField(max_length=255, default="Knowledge, Integrity and Excellence")
-    primary_color = models.CharField(max_length=10, default="#800020") # Burgundy / Wine
+    primary_color = models.CharField(max_length=10, default="#800020")
     secondary_color = models.CharField(max_length=10, default="#17a2b8")
     sidebar_color = models.CharField(max_length=10, default="#1e2229")
     logo = models.ImageField(upload_to="branding/", blank=True, null=True)
+    login_background = models.ImageField(upload_to="branding/", blank=True, null=True)
     contact_email = models.EmailField(default="info@alwasilah.edu.gh")
     contact_phone = models.CharField(max_length=20, default="+233 24 000 0000")
     address = models.TextField(default="Tamale, Northern Region, Ghana")
@@ -56,7 +57,7 @@ class FeeLedger(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.student.username} - {self.title}"
+        return f"{self.user.username} - {self.title}"
 
 class AcademicResult(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='academic_results')
@@ -94,3 +95,14 @@ class Announcement(models.Model):
 
     def __str__(self):
         return self.title
+
+class TimetableEntry(models.Model):
+    class_name = models.CharField(max_length=50, default="Primary 1")
+    day_of_week = models.CharField(max_length=20, default="Monday")
+    period_time = models.CharField(max_length=50, default="08:00 - 09:00")
+    subject_name = models.CharField(max_length=100, default="Mathematics")
+    teacher_name = models.CharField(max_length=100, default="Madam Comfort")
+    venue = models.CharField(max_length=50, default="Classroom 1")
+
+    def __str__(self):
+        return f"{self.class_name} - {self.day_of_week}: {self.subject_name}"
