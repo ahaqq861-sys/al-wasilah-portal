@@ -18,6 +18,7 @@ urlpatterns = [
     path('remarks/', views.manage_remarks_view, name='manage_remarks'),
     path('announcements/', views.announcements_view, name='announcements'),
     path('branding/', views.branding_view, name='branding'),
-    path('placeholder/<str:title>/', views.placeholder_view, name='placeholder'),
+    path('change-password/', views.change_password_view, name='change_password'),
+    path('password-recovery/', views.password_recovery_view, name='password_recovery'),
     path('logout/', views.logout_view, name='logout'),
 ]

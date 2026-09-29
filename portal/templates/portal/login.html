@@ -2,83 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - {{ branding.school_name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            {% if branding.login_background %}
-                background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{{ branding.login_background.url }}') no-repeat center center fixed;
-                background-size: cover;
-            {% else %}
-                background-color: #f4f6f9;
-            {% endif %}
-            min-height: 100vh;
+            background: {% if branding.login_background %}url('{{ branding.login_background.url }}'){% else %}linear-gradient(135deg, #800020, #17a2b8){% endif %};
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .login-card {
-            width: 100%;
-            max-width: 420px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            background: rgba(255, 255, 255, 0.95);
-            border-top: 5px solid {{ branding.primary_color|default:"#800020" }};
-        }
-        .btn-brand {
-            background-color: {{ branding.primary_color|default:"#800020" }};
-            color: #fff;
-        }
-        .btn-brand:hover {
-            background-color: #4a0012;
-            color: #fff;
-        }
+        .login-card { background: rgba(255, 255, 255, 0.95); padding: 2rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 100%; max-width: 400px; }
     </style>
 </head>
 <body>
-
-<div class="login-card p-4">
-    <div class="text-center mb-3">
+    <div class="login-card text-center">
         {% if branding.logo %}
-            <img src="{{ branding.logo.url }}" style="height: 75px; object-fit: contain;" class="mb-2">
-        {% else %}
-            <img src="/static/images/logo.png" style="height: 75px; object-fit: contain;" class="mb-2">
+            <img src="{{ branding.logo.url }}" alt="Logo" class="mb-3 rounded-circle" style="width: 70px; height: 70px; object-fit: cover;">
         {% endif %}
-        <h5 class="fw-bold mb-0" style="color: {{ branding.primary_color|default:"#800020" }};">{{ branding.school_name }}</h5>
-        <small class="text-muted d-block fw-semibold">{{ branding.tagline_subtext|default:"Knowledge, Integrity and Excellence" }}</small>
-    </div>
+        <h4 class="fw-bold mb-1" style="color: #800020;">{{ branding.school_name }}</h4>
+        <p class="text-muted small mb-4">Portal Login</p>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show small py-2" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger small py-2">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3 text-start">
+                <label class="form-label fw-bold small">Username / Index ID</label>
+                <input type="text" name="username" class="form-control" required>
             </div>
-        {% endfor %}
-    {% endif %}
+            <div class="mb-3 text-start">
+                <label class="form-label fw-bold small">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Default: 123456" required>
+            </div>
+            <button type="submit" class="btn btn-dark w-100 fw-bold py-2">Login to Portal</button>
+        </form>
 
-    <form method="POST">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label class="form-label small fw-bold">Index Number / Username</label>
-            <input type="text" name="username" class="form-control form-control-sm" required placeholder="Enter ID or username">
+        <div class="mt-3">
+            <a href="{% url 'portal:password_recovery' %}" class="small text-decoration-none text-danger fw-bold">
+                <i class="fa-solid fa-key me-1"></i> Forgot Password / Password Recovery
+            </a>
         </div>
-        <div class="mb-3">
-            <label class="form-label small fw-bold">Password</label>
-            <input type="password" name="password" class="form-control form-control-sm" required placeholder="Enter password">
-        </div>
-        <button type="submit" class="btn btn-brand w-100 fw-bold btn-sm py-2">Sign In</button>
-    </form>
-
-    <div class="mt-4 pt-3 border-top text-center text-muted" style="font-size: 0.78rem;">
-        <p class="mb-1 fw-bold text-dark"><i class="fa-solid fa-location-dot me-1 text-danger"></i>{{ branding.address|default:"Tamale, Northern Region, Ghana" }}</p>
-        <p class="mb-1"><i class="fa-solid fa-phone me-1 text-success"></i>Phone: {{ branding.contact_phone|default:"+233 24 000 0000" }}</p>
-        <p class="mb-0"><i class="fa-solid fa-envelope me-1 text-primary"></i>Email: {{ branding.contact_email|default:"info@alwasilah.edu.gh" }}</p>
     </div>
-</div>
-
 </body>
 </html>
