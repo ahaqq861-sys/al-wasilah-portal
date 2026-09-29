@@ -3,88 +3,70 @@
 {% block title %}Dashboard - {{ branding.school_name }}{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4 class="fw-bold mb-0" style="color: #333;">Dashboard</h4>
-    <small class="text-muted">Home / Dashboard</small>
-</div>
-
-<!-- Stat Counter Widgets -->
-<div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center" style="border-left: 4px solid var(--brand-primary) !important;">
-            <div class="bg-light p-3 rounded me-3 text-danger"><i class="fa-solid fa-user-graduate fa-2x"></i></div>
-            <div>
-                <small class="text-muted text-uppercase fw-bold">Students</small>
-                <h4 class="fw-bold mb-0">{{ total_students|default:"1" }}</h4>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center" style="border-left: 4px solid #17a2b8 !important;">
-            <div class="bg-light p-3 rounded me-3 text-info"><i class="fa-solid fa-pen-to-square fa-2x"></i></div>
-            <div>
-                <small class="text-muted text-uppercase fw-bold">Assessments</small>
-                <h4 class="fw-bold mb-0">0</h4>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center" style="border-left: 4px solid #28a745 !important;">
-            <div class="bg-light p-3 rounded me-3 text-success"><i class="fa-solid fa-upload fa-2x"></i></div>
-            <div>
-                <small class="text-muted text-uppercase fw-bold">Submissions</small>
-                <h4 class="fw-bold mb-0">0</h4>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-0 shadow-sm p-3 d-flex flex-row align-items-center" style="border-left: 4px solid #ffc107 !important;">
-            <div class="bg-light p-3 rounded me-3 text-warning"><i class="fa-solid fa-users fa-2x"></i></div>
-            <div>
-                <small class="text-muted text-uppercase fw-bold">Teachers</small>
-                <h4 class="fw-bold mb-0">{{ total_teachers|default:"1" }}</h4>
-            </div>
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="portal-card p-4 text-white rounded-2 shadow-sm" style="background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));">
+            <h3 class="fw-bold mb-1">Welcome back, {{ request.user.get_full_name|default:request.user.username }}!</h3>
+            <p class="mb-0 text-white-50">Role: <span class="text-uppercase fw-bold text-white">{{ profile.role }}</span> | Class Assigned: <span class="text-uppercase fw-bold text-white">{{ profile.assigned_class }}</span></p>
         </div>
     </div>
 </div>
 
-<div class="row g-4">
-    <!-- Main Timetable & Schedule Section -->
+<div class="row">
+    <!-- Left Main Content: Quick Stats & Today's Primary School Schedule -->
     <div class="col-lg-8">
-        <div class="portal-card p-3 mb-4">
-            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-                <h6 class="fw-bold mb-0 text-uppercase" style="color: var(--brand-primary);">
-                    <i class="fa-solid fa-calendar-day me-2"></i>Lecture Schedule - {{ today_day_name|default:"Thursday" }} {{ today_date_str|default:"17-Sep-2026" }}
-                </h6>
-                <div>
-                    <button class="btn btn-sm btn-outline-secondary py-0"><i class="fa-solid fa-chevron-left"></i></button>
-                    <button class="btn btn-sm btn-outline-secondary py-0"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="portal-card p-3 border-start border-4 border-primary">
+                    <small class="text-muted fw-bold d-block">TOTAL STUDENTS</small>
+                    <h4 class="fw-bold mb-0 text-primary">{{ total_students|default:"0" }}</h4>
                 </div>
             </div>
+            <div class="col-md-4">
+                <div class="portal-card p-3 border-start border-4 border-success">
+                    <small class="text-muted fw-bold d-block">TOTAL TEACHERS</small>
+                    <h4 class="fw-bold mb-0 text-success">{{ total_teachers|default:"0" }}</h4>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="portal-card p-3 border-start border-4 border-warning">
+                    <small class="text-muted fw-bold d-block">CURRENT TERM</small>
+                    <h4 class="fw-bold mb-0 text-dark">First Term</h4>
+                </div>
+            </div>
+        </div>
 
+        <!-- Primary School Today's Schedule -->
+        <div class="portal-card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0" style="color: var(--brand-primary);"><i class="fa-solid fa-clock-rotate-left me-2"></i>Class Schedule - {{ today_day_name }} ({{ today_date_str }})</h5>
+                <a href="{% url 'portal:timetable' %}" class="btn btn-sm btn-outline-dark fw-bold">View Full Timetable</a>
+            </div>
             <div class="table-responsive">
-                <table class="table table-bordered table-striped table-uds align-middle text-center mb-0">
-                    <thead>
+                <table class="table table-bordered table-striped align-middle" style="font-size: 0.85rem;">
+                    <thead class="table-dark text-uppercase">
                         <tr>
-                            <th>#</th>
-                            <th>Programme</th>
-                            <th>Course</th>
-                            <th>Period</th>
-                            <th>Venue</th>
-                            <th>Category</th>
-                            <th>Status</th>
+                            <th>Period Time</th>
+                            <th>Subject / Activity</th>
+                            <th>Teacher / Instructor</th>
+                            <th>Classroom</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td class="text-start fw-bold">{{ profile.programme|default:"BSC BANKING AND FINANCE" }}</td>
-                            <td>BAF 402</td>
-                            <td>08:00 - 11:00</td>
-                            <td>LT 3</td>
-                            <td>Lecture</td>
-                            <td><span class="badge bg-success">Scheduled</span></td>
-                        </tr>
+                        {% if today_schedule %}
+                            {% for sch in today_schedule %}
+                            <tr>
+                                <td class="fw-bold">{{ sch.period_time }}</td>
+                                <td class="fw-bold text-primary">{{ sch.subject_name }}</td>
+                                <td>{{ sch.teacher_name }}</td>
+                                <td>{{ sch.venue }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-3 text-muted">No scheduled periods found for today. Enjoy learning!</td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>
@@ -93,42 +75,28 @@
 
     <!-- Right Schedule Banner & Dynamic Calendar -->
     <div class="col-lg-4">
-        <!-- Academic Period Wine Box -->
+        <!-- Primary School Banner Box -->
         <div class="card text-white text-center p-4 mb-3 border-0 shadow-sm rounded-1" style="background-color: var(--brand-primary);">
-            <h6 class="fw-bold text-uppercase mb-1" style="color: var(--brand-accent);">Current Schedule</h6>
+            <h6 class="fw-bold text-uppercase mb-1 text-warning">Academic Period</h6>
             <h5 class="fw-bold mb-0">2026/2027</h5>
-            <div class="fw-bold text-uppercase mb-3" style="font-size: 0.85rem;">ACADEMIC YEAR - FIRST TRIMESTER</div>
-            <h3 class="fw-bold text-uppercase mb-0">{{ today_day_name|default:"THURSDAY" }}</h3>
-            <div class="fw-bold">{{ today_date_str|default:"17-SEP-2026" }}</div>
-            <a href="{% url 'portal:placeholder' 'Timetable' %}" class="btn btn-info btn-sm mt-3 text-white fw-bold px-4 rounded-0">
-                <i class="fa-solid fa-calendar-check me-1"></i> View Timetable
+            <div class="fw-bold text-uppercase mb-3" style="font-size: 0.85rem;">FIRST TRIMESTER</div>
+            <h3 class="fw-bold text-uppercase mb-0">{{ today_day_name|default:"TUESDAY" }}</h3>
+            <div class="fw-bold">{{ today_date_str|default:"29-Sep-2026" }}</div>
+            <a href="{% url 'portal:timetable' %}" class="btn btn-light btn-sm mt-3 fw-bold px-4 rounded-0 text-dark">
+                <i class="fa-solid fa-calendar-check me-1"></i> Open Timetable
             </a>
         </div>
 
-        <!-- UDS Calendar Sidebar Widget -->
-        <div class="card border-0 shadow-sm rounded-1">
-            <div class="card-header text-white py-2 fw-bold d-flex justify-content-between align-items-center" style="background-color: #17a2b8;">
-                <span><i class="fa-solid fa-calendar-days me-2"></i>September 2026</span>
-                <div>
-                    <i class="fa-solid fa-chevron-left me-2"></i>
-                    <i class="fa-solid fa-chevron-right"></i>
+        <!-- Up-to-date Calendar Widget -->
+        <div class="portal-card p-3">
+            <h6 class="fw-bold mb-3 border-bottom pb-2" style="color: var(--brand-primary);"><i class="fa-solid fa-calendar-days me-2"></i>Academic Calendar</h6>
+            <div class="text-center">
+                <h5 class="fw-bold text-dark mb-1">September / October 2026</h5>
+                <p class="text-muted small mb-3">Term 1 Sessions in Progress</p>
+                <div class="alert alert-light border small text-start mb-0">
+                    <p class="mb-1 fw-bold text-success"><i class="fa-solid fa-circle-check me-1"></i>Classes in Session</p>
+                    <p class="mb-0 text-secondary" style="font-size: 0.78rem;">Regular morning assembly begins at 7:30 AM daily. Closing bell at 2:00 PM.</p>
                 </div>
-            </div>
-            <div class="card-body p-2">
-                <table class="w-100 text-center small table-borderless">
-                    <thead>
-                        <tr class="text-muted fw-bold">
-                            <th>Su</th><th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td class="text-muted">30</td><td class="text-muted">31</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
-                        <tr><td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td></tr>
-                        <tr><td>13</td><td>14</td><td>15</td><td>16</td><td class="bg-info text-white fw-bold rounded-circle">17</td><td>18</td><td>19</td></tr>
-                        <tr><td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td></tr>
-                        <tr><td>27</td><td>28</td><td>29</td><td>30</td><td class="text-muted">1</td><td class="text-muted">2</td><td class="text-muted">3</td></tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
