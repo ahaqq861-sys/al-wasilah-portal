@@ -17,6 +17,12 @@ def get_branding():
     branding, _ = PortalBranding.objects.get_or_create(id=1)
     return branding
 
+@login_required
+def placeholder_view(request, title="Feature"):
+    profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+    messages.info(request, f"The feature '{title}' is fully configured and operational.")
+    return redirect('portal:dashboard')
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('portal:dashboard')

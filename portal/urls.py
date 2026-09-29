@@ -18,5 +18,6 @@ urlpatterns = [
     path('remarks/', views.manage_remarks_view, name='manage_remarks'),
     path('announcements/', views.announcements_view, name='announcements'),
     path('branding/', views.branding_view, name='branding'),
+    path('placeholder/<str:title>/', views.placeholder_view, name='placeholder'),
     path('logout/', views.logout_view, name='logout'),
 ]
