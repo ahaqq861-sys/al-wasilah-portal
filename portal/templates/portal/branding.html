@@ -65,10 +65,21 @@
                     <input type="text" name="footer_copyright" value="{{ branding.footer_copyright }}" class="form-control" required>
                 </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold">Upload Official School Crest Logo</label>
-                    <input type="file" name="logo" class="form-control" accept="image/*">
-                    <small class="text-muted d-block mt-1">Recommended format: PNG or JPG with transparent background.</small>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Upload Official School Crest Logo</label>
+                        <input type="file" name="logo" class="form-control" accept="image/*">
+                        {% if branding.logo %}
+                            <small class="text-success d-block mt-1"><i class="fa-solid fa-check me-1"></i>Current logo uploaded: {{ branding.logo.name }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Upload Login Page Background Picture</label>
+                        <input type="file" name="login_background" class="form-control" accept="image/*">
+                        {% if branding.login_background %}
+                            <small class="text-success d-block mt-1"><i class="fa-solid fa-check me-1"></i>Current background uploaded: {{ branding.login_background.name }}</small>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-brand fw-bold px-4 py-2"><i class="fa-solid fa-floppy-disk me-2"></i> Save Branding Settings</button>
@@ -77,13 +88,3 @@
     </div>
 </div>
 {% endblock %}
-<div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Upload Official School Crest Logo</label>
-                        <input type="file" name="logo" class="form-control" accept="image/*">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold">Upload Login Page Background Picture</label>
-                        <input type="file" name="login_background" class="form-control" accept="image/*">
-                    </div>
-                </div>
