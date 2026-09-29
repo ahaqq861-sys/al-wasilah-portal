@@ -87,7 +87,6 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'portal:dashboard'
 LOGOUT_REDIRECT_URL = 'login'
 
-# Cloudinary Setup for Render Environment Variables
 import cloudinary
 import cloudinary.uploader
 
@@ -96,5 +95,4 @@ cloudinary.config(
     api_key=os.environ.get('CLOUDINARY_API_KEY'),
     api_secret=os.environ.get('CLOUDINARY_API_SECRET'),
     secure=True
-)MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+)
