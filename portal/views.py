@@ -44,7 +44,7 @@ def password_recovery_view(request):
             target_profile.must_change_password = True
             target_profile.save()
             messages.success(request, f"Password for account '{username}' has been reset to default: 123456.")
-            return redirect('root_login')
+            return redirect('login')
         except User.DoesNotExist:
             messages.error(request, "Account username not found in the system.")
     
@@ -161,7 +161,7 @@ def registration_view(request):
             new_profile.index_number = username
             new_profile.generated_password = '123456'
             new_profile.must_change_password = True
-            if 'passport_picture' in request.FILES:
+            if role == 'student' and 'passport_picture' in request.FILES:
                 new_profile.passport_picture = request.FILES['passport_picture']
             new_profile.save()
 
@@ -296,14 +296,17 @@ def branding_view(request):
         branding.tagline_subtext = request.POST.get('tagline_subtext', branding.tagline_subtext)
         branding.primary_color = request.POST.get('primary_color', branding.primary_color)
         branding.secondary_color = request.POST.get('secondary_color', branding.secondary_color)
+        branding.contact_phone = request.POST.get('contact_phone', branding.contact_phone)
+        branding.contact_email = request.POST.get('contact_email', branding.contact_email)
+        branding.address = request.POST.get('address', branding.address)
         if 'logo' in request.FILES: branding.logo = request.FILES['logo']
         if 'login_background' in request.FILES: branding.login_background = request.FILES['login_background']
         branding.save()
-        messages.success(request, "Branding updated.")
+        messages.success(request, "Branding and school contact details updated successfully.")
         return redirect('portal:branding')
     context = {'branding': branding, 'profile': profile}
     return render(request, 'portal/branding.html', context)
 
 def logout_view(request):
     logout(request)
-    return redirect('root_login')
+    return redirect('login')
